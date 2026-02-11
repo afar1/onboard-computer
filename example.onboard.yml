@@ -1,0 +1,13 @@
+name: "Onboard Demo"
+description: "A sample onboard file to demonstrate cell execution."
+
+cells:
+  - type: bash
+    title: "Check Swift version"
+    description: "Verify that Swift is installed and print its version."
+    command: "swift --version"
+
+  - type: bash
+    title: "List current directory"
+    description: "Show the contents of the current working directory."
+    command: "ls -la"
