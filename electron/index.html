@@ -121,7 +121,7 @@
             <div class="tool-desc">This is where all your code projects will live. Pick a name you like — it'll be created in your home directory.</div>
           </div>
         </div>
-        <div class="tool-details">
+        <div class="tool-details" style="display: block;">
           <div class="input-group">
             <label>Folder name</label>
             <div class="input-row">
@@ -148,7 +148,7 @@
           <label>Repository URL</label>
           <div class="input-row">
             <input type="text" class="text-input" id="clone-url-input" value="https://github.com/vercel/next.js.git" placeholder="https://github.com/user/repo.git">
-            <button class="btn btn-primary" id="clone-btn" onclick="cloneProject()">Clone</button>
+            <button class="btn btn-primary" id="clone-btn" onclick="cloneProject()" disabled>Clone</button>
           </div>
           <div class="suggestions">
             <span class="suggestion-pill" onclick="suggestRepo('https://github.com/vercel/next.js.git')">next.js</span>

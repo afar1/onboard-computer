@@ -26,7 +26,7 @@ const TOOLS = [
     iconBg: 'var(--red-dim)',
     iconColor: 'var(--red)',
     desc: 'Version control. Track changes, collaborate, push to GitHub.',
-    explain: '<strong>Why:</strong> Git is how every developer tracks code changes and collaborates. When you "push" code to GitHub or "pull" someone else\'s project, you\'re using Git. It\'s non-negotiable.',
+    explain: '<strong>Why:</strong> Git is how every developer tracks code changes and collaborates. When you "push" code to GitHub or "pull" someone else\'s project, you\'re using Git. It\'s non-negotiable — every team, every project, everywhere.',
     installCmd: 'brew install git',
     dependsOn: 'homebrew',
   },
@@ -37,7 +37,7 @@ const TOOLS = [
     iconBg: 'var(--green-dim)',
     iconColor: 'var(--green)',
     desc: 'JavaScript runtime. Runs JS outside the browser, powers npm.',
-    explain: '<strong>Why:</strong> Node.js lets you run JavaScript on your machine (not just in a browser). It comes with npm, the package manager that installs libraries for web projects. Most modern web development depends on it.',
+    explain: '<strong>Why:</strong> Node.js lets you run JavaScript on your machine (not just in a browser). It comes with <strong>npm</strong>, the package manager that installs libraries for web projects. Most modern web development depends on Node.',
     installCmd: 'brew install node',
     dependsOn: 'homebrew',
   },
@@ -48,7 +48,7 @@ const TOOLS = [
     iconBg: 'var(--blue-dim)',
     iconColor: 'var(--blue)',
     desc: 'General-purpose language. Used for scripting, AI/ML, and tooling.',
-    explain: '<strong>Why:</strong> Python is everywhere — data science, automation, backend APIs, AI tools. Even if you\'re mainly doing web dev, you\'ll bump into Python scripts regularly. macOS ships with an old version; we need Python 3.',
+    explain: '<strong>Why:</strong> Python is everywhere — data science, automation, backend APIs, AI tools. Even if you\'re mainly doing web dev, you\'ll encounter Python scripts regularly. macOS ships with an old version; we need Python 3.',
     installCmd: 'brew install python@3',
     dependsOn: 'homebrew',
   },
@@ -56,10 +56,10 @@ const TOOLS = [
     id: 'bun',
     name: 'Bun',
     icon: '🥟',
-    iconBg: 'var(--purple); opacity: 0.15',
+    iconBg: 'rgba(188, 140, 255, 0.15)',
     iconColor: 'var(--purple)',
     desc: 'Fast JavaScript runtime and package manager. Drop-in npm replacement.',
-    explain: '<strong>Why:</strong> Bun is a modern, blazing-fast alternative to Node.js for running JavaScript and installing packages. Many newer projects use it for speed. It\'s optional but increasingly popular.',
+    explain: '<strong>Why:</strong> Bun is a blazing-fast alternative to Node.js for running JavaScript and installing packages. Many newer projects use it for speed. It\'s optional but increasingly popular in the ecosystem.',
     installCmd: 'brew install oven-sh/bun/bun',
     dependsOn: 'homebrew',
   },
@@ -70,7 +70,7 @@ const TOOLS = [
     iconBg: 'var(--blue-dim)',
     iconColor: 'var(--blue)',
     desc: 'AI coding assistant from Anthropic. Powers your pair programming.',
-    explain: '<strong>Why:</strong> The Claude CLI gives you an AI coding partner right in your terminal. It can help write code, explain errors, refactor, and debug. It\'s the backbone of the AI-assisted development workflow.',
+    explain: '<strong>Why:</strong> The Claude CLI gives you an AI coding partner right in your terminal. It can write code, explain errors, refactor, and debug alongside you. This is the engine behind the AI-assisted development workflow and the <code>field-theory</code> toolchain.',
     installCmd: 'npm install -g @anthropic-ai/claude-code',
     dependsOn: 'node',
   },
@@ -92,11 +92,9 @@ let clonedProjectPath = '';
 
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    // Remove active from all tabs and panels.
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
 
-    // Activate the clicked tab and its panel.
     btn.classList.add('active');
     const panelId = 'panel-' + btn.dataset.tab;
     document.getElementById(panelId).classList.add('active');
@@ -104,7 +102,10 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 });
 
 // ─── Render Tool Cards ─────────────────────────────────────────────
-// Build the DOM for each tool card on the Dependencies tab.
+// Builds the DOM for each tool card on the Dependencies tab.
+// We preserve the open/closed state of detail panels across re-renders.
+
+const expandedPanels = new Set();
 
 function renderToolCards() {
   const container = document.getElementById('tools-container');
@@ -112,6 +113,7 @@ function renderToolCards() {
 
   TOOLS.forEach(tool => {
     const state = toolStates[tool.id];
+    const isExpanded = expandedPanels.has(tool.id);
     const card = document.createElement('div');
     card.className = 'tool-card fade-in';
     card.id = `tool-${tool.id}`;
@@ -131,12 +133,12 @@ function renderToolCards() {
           ${renderToolAction(tool, state)}
         </div>
       </div>
-      <div class="tool-details" id="details-${tool.id}" style="display: none;">
+      <div class="tool-details" id="details-${tool.id}" style="display: ${isExpanded ? 'block' : 'none'};">
         <div class="tool-explain">${tool.explain}</div>
         ${tool.installCmd ? `
           <div class="install-command">
             <code>${escapeHtml(tool.installCmd)}</code>
-            <button class="copy-btn" onclick="copyToClipboard('${escapeJs(tool.installCmd)}', this)" title="Copy command">📋</button>
+            <button class="copy-btn" onclick="copyToClipboard(\`${tool.installCmd.replace(/`/g, '\\`')}\`, this)" title="Copy command">📋</button>
           </div>
         ` : ''}
         ${tool.installNote ? `<div class="tool-explain" style="margin-top: 8px; font-style: italic;">${tool.installNote}</div>` : ''}
@@ -144,12 +146,16 @@ function renderToolCards() {
       </div>
     `;
 
-    // Toggle details on header click.
+    // Toggle detail expansion on header click.
     card.querySelector('.tool-card-header').addEventListener('click', (e) => {
-      // Don't toggle if they clicked a button.
       if (e.target.closest('button')) return;
+      if (expandedPanels.has(tool.id)) {
+        expandedPanels.delete(tool.id);
+      } else {
+        expandedPanels.add(tool.id);
+      }
       const details = card.querySelector('.tool-details');
-      details.style.display = details.style.display === 'none' ? 'block' : 'none';
+      details.style.display = expandedPanels.has(tool.id) ? 'block' : 'none';
     });
 
     container.appendChild(card);
@@ -180,6 +186,10 @@ function renderToolAction(tool, state) {
     return '<span style="color: var(--green); font-size: 18px;">✓</span>';
   }
   if (state.status === 'checked' && !state.installed) {
+    // Show dependency hint if the parent tool isn't installed yet.
+    if (tool.dependsOn && !toolStates[tool.dependsOn].installed) {
+      return `<button class="btn btn-sm" disabled title="Install ${TOOLS.find(t => t.id === tool.dependsOn).name} first">Needs ${TOOLS.find(t => t.id === tool.dependsOn).name}</button>`;
+    }
     return `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); installTool('${tool.id}')">Install</button>`;
   }
   return '';
@@ -191,7 +201,7 @@ async function checkAllDependencies() {
   const btn = document.getElementById('check-all-btn');
   btn.disabled = true;
   btn.textContent = 'Checking...';
-  setStatus('Checking installed tools...');
+  setStatus('Scanning your machine for installed tools...');
 
   for (const tool of TOOLS) {
     toolStates[tool.id].status = 'checking';
@@ -220,13 +230,13 @@ async function checkAllDependencies() {
 }
 
 // ─── Install a Tool ────────────────────────────────────────────────
-// Runs the install command for a given tool and shows output.
+// Runs the install command for a given tool and shows streaming output.
 
 async function installTool(toolId) {
   const tool = TOOLS.find(t => t.id === toolId);
   if (!tool) return;
 
-  // Check dependency is installed first.
+  // Enforce dependency ordering.
   if (tool.dependsOn && !toolStates[tool.dependsOn].installed) {
     const dep = TOOLS.find(t => t.id === tool.dependsOn);
     alert(`You need to install ${dep.name} first.`);
@@ -234,12 +244,11 @@ async function installTool(toolId) {
   }
 
   toolStates[toolId].status = 'installing';
+  expandedPanels.add(toolId);
   renderToolCards();
 
-  // Show details and output.
-  const details = document.getElementById(`details-${toolId}`);
+  // Show the output panel inside the card.
   const output = document.getElementById(`output-${toolId}`);
-  if (details) details.style.display = 'block';
   if (output) {
     output.style.display = 'block';
     output.innerHTML = `<span class="cmd">$ ${escapeHtml(tool.installCmd)}</span>\n`;
@@ -248,20 +257,22 @@ async function installTool(toolId) {
   setStatus(`Installing ${tool.name}...`);
 
   try {
-    // Listen for streaming output.
-    const streamHandler = (data) => {
+    // Route streaming output into this tool's terminal panel.
+    window.onboard.setStreamCallback((data) => {
       if (output) {
         const cls = data.stream === 'stderr' ? 'err' : '';
         output.innerHTML += `<span class="${cls}">${escapeHtml(data.data)}</span>`;
         output.scrollTop = output.scrollHeight;
       }
-    };
-    window.onboard.onStreamOutput(streamHandler);
+    });
 
     const result = await window.onboard.runStreaming(tool.installCmd);
 
+    // Done streaming — clear the callback.
+    window.onboard.clearStreamCallback();
+
     if (result.succeeded) {
-      // Re-check to confirm installation and get version.
+      // Re-check to confirm installation and get version info.
       const check = await window.onboard.checkTool(toolId);
       toolStates[toolId] = {
         status: 'checked',
@@ -275,12 +286,10 @@ async function installTool(toolId) {
       toolStates[toolId].status = 'checked';
       if (output) {
         output.innerHTML += `\n<span class="err">✗ Installation failed (exit code ${result.exitCode}).</span>`;
-        if (result.stderr) {
-          output.innerHTML += `\n<span class="err">${escapeHtml(result.stderr)}</span>`;
-        }
       }
     }
   } catch (err) {
+    window.onboard.clearStreamCallback();
     toolStates[toolId].status = 'checked';
     if (output) {
       output.innerHTML += `\n<span class="err">Error: ${escapeHtml(err.message)}</span>`;
@@ -302,7 +311,7 @@ function updateProgress() {
   document.getElementById('deps-progress').style.width = pct + '%';
   document.getElementById('deps-progress-label').textContent = `${installed}/${total} installed`;
 
-  // Update tab badge.
+  // Update the badge on the Dependencies tab.
   const badge = document.getElementById('deps-badge');
   if (installed === total) {
     badge.className = 'tab-badge complete';
@@ -319,9 +328,9 @@ function updateOverallStatus() {
   const missing = total - installed;
 
   if (missing === 0) {
-    setStatus('All dependencies installed. You\'re ready!');
+    setStatus('All dependencies installed. You\'re ready to build.');
   } else {
-    setStatus(`${missing} tool${missing > 1 ? 's' : ''} still needed.`);
+    setStatus(`${missing} tool${missing > 1 ? 's' : ''} still needed. Install them in order, top to bottom.`);
   }
 }
 
@@ -336,17 +345,17 @@ async function installGhCli() {
   output.style.display = 'block';
   output.innerHTML = '<span class="cmd">$ brew install gh</span>\n';
 
-  const streamHandler = (data) => {
+  window.onboard.setStreamCallback((data) => {
     output.innerHTML += escapeHtml(data.data);
     output.scrollTop = output.scrollHeight;
-  };
-  window.onboard.onStreamOutput(streamHandler);
+  });
 
   const result = await window.onboard.runStreaming('brew install gh');
+  window.onboard.clearStreamCallback();
+
   if (result.succeeded) {
     output.innerHTML += '\n<span class="info">✓ GitHub CLI installed.</span>';
-    document.getElementById('gh-step-cli').classList.add('done');
-    document.getElementById('gh-step-cli').textContent = '✓';
+    markStep('gh-step-cli');
   } else {
     output.innerHTML += `\n<span class="err">✗ Failed. ${escapeHtml(result.stderr)}</span>`;
   }
@@ -358,16 +367,26 @@ async function ghAuthLogin() {
   output.innerHTML += '\n<span class="cmd">$ gh auth login</span>\n';
   output.innerHTML += '<span class="info">Opening browser for GitHub authentication...</span>\n';
 
-  // gh auth login with web flow.
+  // Use the web-based auth flow.
   const result = await window.onboard.run('gh auth login --web --git-protocol https 2>&1 || true');
   output.innerHTML += escapeHtml(result.stdout || result.stderr) + '\n';
 
-  // Check if auth worked.
+  // Verify authentication succeeded.
   const check = await window.onboard.run('gh auth status 2>&1');
   if (check.succeeded) {
     output.innerHTML += '\n<span class="info">✓ Authenticated with GitHub!</span>';
-    document.getElementById('gh-step-login').classList.add('done');
-    document.getElementById('gh-step-login').textContent = '✓';
+    markStep('gh-step-login');
+  } else {
+    output.innerHTML += '\n<span class="err">Auth check didn\'t pass. You may need to complete it in your browser.</span>';
+  }
+}
+
+// Helper to mark a step dot as complete.
+function markStep(stepId) {
+  const el = document.getElementById(stepId);
+  if (el) {
+    el.classList.add('done');
+    el.textContent = '✓';
   }
 }
 
@@ -387,19 +406,24 @@ function suggestRepo(url) {
 
 async function createDevFolder() {
   const folderName = document.getElementById('dev-folder-input').value.trim();
-  if (!folderName) return;
+  if (!folderName) {
+    document.getElementById('dev-folder-input').focus();
+    return;
+  }
 
   const output = document.getElementById('folder-output');
   output.style.display = 'block';
 
   devFolderPath = `${homeDir}/${folderName}`;
-  output.innerHTML = `<span class="cmd">$ mkdir -p ${escapeHtml(devFolderPath)}</span>\n`;
+  output.innerHTML = `<span class="cmd">$ mkdir -p ~/${escapeHtml(folderName)}</span>\n`;
 
+  // Check if it already exists.
   const exists = await window.onboard.dirExists(devFolderPath);
   if (exists) {
     output.innerHTML += `<span class="info">✓ Folder already exists at ${escapeHtml(devFolderPath)}</span>`;
     document.getElementById('create-folder-btn').textContent = '✓ Exists';
-    document.getElementById('clone-btn').disabled = false;
+    document.getElementById('create-folder-btn').classList.add('btn-success');
+    enableCloneButton();
     return;
   }
 
@@ -407,10 +431,15 @@ async function createDevFolder() {
   if (result.success) {
     output.innerHTML += `<span class="info">✓ Created ${escapeHtml(result.path)}</span>`;
     document.getElementById('create-folder-btn').textContent = '✓ Created';
-    document.getElementById('clone-btn').disabled = false;
+    document.getElementById('create-folder-btn').classList.add('btn-success');
+    enableCloneButton();
   } else {
     output.innerHTML += `<span class="err">✗ ${escapeHtml(result.error)}</span>`;
   }
+}
+
+function enableCloneButton() {
+  document.getElementById('clone-btn').disabled = false;
 }
 
 async function cloneProject() {
@@ -420,32 +449,34 @@ async function cloneProject() {
   const output = document.getElementById('clone-output');
   output.style.display = 'block';
 
-  // Extract repo name from URL.
+  // Extract repo name from the URL (e.g., "next.js" from the github URL).
   const repoName = url.split('/').pop().replace('.git', '');
   clonedProjectPath = `${devFolderPath}/${repoName}`;
 
-  const cmd = `cd "${devFolderPath}" && git clone --depth 1 ${url}`;
-  output.innerHTML = `<span class="cmd">$ git clone ${escapeHtml(url)}</span>\n<span class="info">Cloning into ${escapeHtml(devFolderPath)}/${escapeHtml(repoName)}...</span>\n`;
+  output.innerHTML = `<span class="cmd">$ git clone --depth 1 ${escapeHtml(url)}</span>\n<span class="info">Cloning into ~/${escapeHtml(devFolderPath.split('/').pop())}/${escapeHtml(repoName)}...</span>\n`;
 
-  document.getElementById('clone-btn').disabled = true;
-  document.getElementById('clone-btn').textContent = 'Cloning...';
+  const cloneBtn = document.getElementById('clone-btn');
+  cloneBtn.disabled = true;
+  cloneBtn.textContent = 'Cloning...';
 
-  const streamHandler = (data) => {
+  window.onboard.setStreamCallback((data) => {
     output.innerHTML += escapeHtml(data.data);
     output.scrollTop = output.scrollHeight;
-  };
-  window.onboard.onStreamOutput(streamHandler);
+  });
 
+  const cmd = `cd "${devFolderPath}" && git clone --depth 1 ${url}`;
   const result = await window.onboard.runStreaming(cmd);
+  window.onboard.clearStreamCallback();
 
   if (result.succeeded) {
     output.innerHTML += `\n<span class="info">✓ Cloned to ${escapeHtml(clonedProjectPath)}</span>`;
-    document.getElementById('clone-btn').textContent = '✓ Cloned';
+    cloneBtn.textContent = '✓ Cloned';
+    cloneBtn.classList.add('btn-success');
     document.getElementById('run-btn').disabled = false;
   } else {
-    output.innerHTML += `\n<span class="err">✗ Clone failed.</span>`;
-    document.getElementById('clone-btn').disabled = false;
-    document.getElementById('clone-btn').textContent = 'Retry';
+    output.innerHTML += `\n<span class="err">✗ Clone failed. Check the URL and try again.</span>`;
+    cloneBtn.disabled = false;
+    cloneBtn.textContent = 'Retry';
   }
 }
 
@@ -455,39 +486,39 @@ async function runProject() {
   const output = document.getElementById('run-output');
   output.style.display = 'block';
 
-  document.getElementById('run-btn').disabled = true;
-  document.getElementById('run-btn').textContent = 'Installing...';
+  const runBtn = document.getElementById('run-btn');
+  runBtn.disabled = true;
+  runBtn.textContent = 'Installing deps...';
 
-  // First: npm install.
-  output.innerHTML = `<span class="cmd">$ cd ${escapeHtml(clonedProjectPath)} && npm install</span>\n`;
+  output.innerHTML = `<span class="cmd">$ cd ${escapeHtml(clonedProjectPath)}</span>\n`;
+  output.innerHTML += `<span class="cmd">$ npm install</span>\n`;
 
-  const streamHandler = (data) => {
+  window.onboard.setStreamCallback((data) => {
     output.innerHTML += escapeHtml(data.data);
     output.scrollTop = output.scrollHeight;
-  };
-  window.onboard.onStreamOutput(streamHandler);
+  });
 
   const installResult = await window.onboard.runStreaming(`cd "${clonedProjectPath}" && npm install`);
+  window.onboard.clearStreamCallback();
 
   if (!installResult.succeeded) {
-    output.innerHTML += `\n<span class="err">✗ npm install failed.</span>`;
-    document.getElementById('run-btn').disabled = false;
-    document.getElementById('run-btn').textContent = 'Retry';
+    output.innerHTML += `\n<span class="err">✗ npm install failed. Check the output above.</span>`;
+    runBtn.disabled = false;
+    runBtn.textContent = 'Retry';
     return;
   }
 
-  output.innerHTML += `\n<span class="info">✓ Dependencies installed.</span>\n`;
-
-  // Check for common start scripts.
-  output.innerHTML += `\n<span class="cmd">$ npm run dev (or npm start)</span>\n`;
+  output.innerHTML += `\n<span class="info">✓ Dependencies installed.</span>\n\n`;
+  output.innerHTML += `<span class="cmd">$ npm run dev</span>\n`;
   output.innerHTML += `<span class="info">Starting project... Check your browser at http://localhost:3000</span>\n`;
 
-  document.getElementById('run-btn').textContent = '✓ Running';
+  runBtn.textContent = '✓ Running';
+  runBtn.classList.add('btn-success');
 
-  // Run dev server (non-blocking — it'll keep running).
+  // Fire off the dev server. This runs in the background — we don't await it.
   window.onboard.run(`cd "${clonedProjectPath}" && (npm run dev || npm start) &`);
 
-  // Show success.
+  // Show the success banner.
   document.getElementById('workspace-success').style.display = 'block';
 }
 
@@ -495,11 +526,11 @@ async function runProject() {
 
 function escapeHtml(str) {
   if (!str) return '';
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
-function escapeJs(str) {
-  return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 async function copyToClipboard(text, btn) {
@@ -509,48 +540,41 @@ async function copyToClipboard(text, btn) {
     btn.textContent = '✓';
     setTimeout(() => { btn.textContent = original; }, 1500);
   } catch {
-    // Fallback: just select the text.
+    // Clipboard API may fail in some contexts — silently ignore.
   }
 }
 
-// ─── GitHub Auth Check ─────────────────────────────────────────────
-// Run on startup to see if gh is already authed.
+// ─── Startup Checks ───────────────────────────────────────────────
+// Run on load to pre-populate the accounts tab status.
 
 async function checkGitHubAuth() {
-  const ghCheck = await window.onboard.run('gh auth status 2>&1');
-  if (ghCheck.succeeded) {
-    document.getElementById('gh-step-login').classList.add('done');
-    document.getElementById('gh-step-login').textContent = '✓';
-  }
-
-  const ghInstalled = await window.onboard.checkTool('git');
-  if (ghInstalled.installed) {
-    document.getElementById('gh-step-account').classList.add('done');
-    document.getElementById('gh-step-account').textContent = '✓';
-  }
-
-  // Check if gh CLI is installed.
+  // Check if gh CLI exists.
   const ghCliCheck = await window.onboard.run('which gh');
   if (ghCliCheck.succeeded) {
-    document.getElementById('gh-step-cli').classList.add('done');
-    document.getElementById('gh-step-cli').textContent = '✓';
+    markStep('gh-step-cli');
+  }
+
+  // Check if authenticated.
+  const ghAuth = await window.onboard.run('gh auth status 2>&1');
+  if (ghAuth.succeeded) {
+    markStep('gh-step-login');
+    markStep('gh-step-account');
   }
 }
 
 // ─── Init ──────────────────────────────────────────────────────────
-// Runs when the page loads. Renders cards, fetches home dir, checks tools.
+// Entry point. Fetches home dir, renders the UI, runs initial checks.
 
 async function init() {
   homeDir = await window.onboard.homedir();
-  document.getElementById('dev-folder-input').placeholder = 'Dev';
 
   renderToolCards();
-  setStatus('Ready. Click "Check All" to scan your machine.');
+  setStatus('Scanning your machine...');
 
-  // Auto-check dependencies on load.
+  // Run dependency checks automatically on launch.
   await checkAllDependencies();
 
-  // Also check GitHub auth in the background.
+  // Check GitHub auth status in the background.
   checkGitHubAuth();
 }
 

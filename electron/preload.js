@@ -4,6 +4,18 @@
 
 const { contextBridge, ipcRenderer } = require('electron');
 
+// Track the current stream listener so we can swap it out
+// between streaming commands (prevents listener accumulation).
+let currentStreamCallback = null;
+
+function streamRouter(_event, data) {
+  if (currentStreamCallback) currentStreamCallback(data);
+}
+
+// Register exactly one listener on the channel. The callback
+// is swapped via setStreamCallback below.
+ipcRenderer.on('shell:streamOutput', streamRouter);
+
 contextBridge.exposeInMainWorld('onboard', {
   // Run a shell command and get back { stdout, stderr, exitCode, succeeded }.
   run: (command) => ipcRenderer.invoke('shell:run', command),
@@ -26,8 +38,14 @@ contextBridge.exposeInMainWorld('onboard', {
   // Run a command with streaming output (for long installs).
   runStreaming: (command) => ipcRenderer.invoke('shell:runStreaming', command),
 
-  // Listen for streaming output chunks during long-running commands.
-  onStreamOutput: (callback) => {
-    ipcRenderer.on('shell:streamOutput', (_event, data) => callback(data));
+  // Set the callback that receives streaming output chunks.
+  // Only one callback is active at a time — calling this replaces the previous one.
+  setStreamCallback: (callback) => {
+    currentStreamCallback = callback;
+  },
+
+  // Clear the stream callback (call after streaming is done).
+  clearStreamCallback: () => {
+    currentStreamCallback = null;
   },
 });
