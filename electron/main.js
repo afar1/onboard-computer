@@ -17,14 +17,15 @@ function createWindow() {
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width: screenW, height: screenH } = primaryDisplay.workAreaSize;
 
-  const winWidth = Math.round(screenW * 0.38);
-  const winHeight = Math.round(screenH * 0.82);
+  const winWidth = Math.min(Math.round(screenW * 0.38), 580);
+  const winHeight = Math.round(screenH * 0.75);
 
   const win = new BrowserWindow({
     width: winWidth,
     height: winHeight,
-    minWidth: 520,
-    minHeight: 600,
+    minWidth: 480,
+    minHeight: 500,
+    maxWidth: 580,
     center: true,
     titleBarStyle: 'hiddenInset',
     backgroundColor: '#0d1117',
@@ -104,6 +105,7 @@ ipcMain.handle('shell:run', async (_event, command) => {
 // Check if a tool is installed by running `which <tool>` and optionally a version command.
 ipcMain.handle('tool:check', async (_event, toolId) => {
   const checks = {
+    'xcode-cli': { which: 'xcode-select', version: 'xcode-select -p >/dev/null 2>&1 && echo "installed" || echo ""' },
     homebrew: { which: 'brew', version: 'brew --version | head -1' },
     git: { which: 'git', version: 'git --version' },
     node: { which: 'node', version: 'node --version' },
@@ -111,6 +113,8 @@ ipcMain.handle('tool:check', async (_event, toolId) => {
     python: { which: 'python3', version: 'python3 --version' },
     claude: { which: 'claude', version: 'claude --version 2>/dev/null || echo "installed"' },
     bun: { which: 'bun', version: 'bun --version' },
+    gh: { which: 'gh', version: 'gh --version | head -1' },
+    'cursor-cli': { which: 'cursor', version: 'cursor --version 2>/dev/null || echo "installed"' },
   };
 
   const check = checks[toolId];

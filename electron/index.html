@@ -13,12 +13,16 @@
   <!-- Draggable title bar region (macOS hidden inset style) -->
   <div class="drag-region">
     <span class="title-text">Onboard</span>
+    <div class="theme-toggle" style="-webkit-app-region: no-drag;">
+      <button id="theme-dark" class="active" onclick="setTheme('dark')">Dark</button>
+      <button id="theme-light" onclick="setTheme('light')">Light</button>
+    </div>
   </div>
 
   <!-- Tab navigation -->
   <div class="tab-bar">
     <button class="tab-btn active" data-tab="dependencies">
-      Dependencies
+      Setup
       <span class="tab-badge pending" id="deps-badge">—</span>
     </button>
     <button class="tab-btn" data-tab="accounts">
@@ -32,23 +36,44 @@
   <!-- Scrollable content area -->
   <div class="tab-content">
 
-    <!-- ═══════ Dependencies Tab ═══════ -->
+    <!-- ═══════ Setup Tab ═══════ -->
     <div class="tab-panel active" id="panel-dependencies">
-      <div class="section-header">
-        <h2>System Dependencies</h2>
-        <p>We'll check your machine for the tools you need to start building. Install anything that's missing — order matters, so we'll go top to bottom.</p>
-      </div>
 
-      <!-- Progress bar across all deps -->
-      <div class="progress-bar">
-        <div class="progress-track">
-          <div class="progress-fill" id="deps-progress" style="width: 0%"></div>
+      <!-- System Dependencies Stack -->
+      <div class="card-stack-container">
+        <div class="card-stack-header">
+          <h3>System Dependencies</h3>
+          <div class="card-stack-actions">
+            <span class="progress-label" id="deps-progress-label" style="margin-right: 8px;">Checking...</span>
+            <button class="btn btn-sm" id="show-all-deps-btn" onclick="toggleStack('deps')">Show All</button>
+            <button class="btn btn-primary btn-sm" id="install-all-deps-btn" onclick="installAllDeps()">Install All</button>
+          </div>
         </div>
-        <span class="progress-label" id="deps-progress-label">Checking...</span>
+        <div class="card-stack" id="tools-stack">
+          <button class="stack-nav prev" onclick="navigateStack('deps', -1)">‹</button>
+          <button class="stack-nav next" onclick="navigateStack('deps', 1)">›</button>
+          <div id="tools-container"></div>
+        </div>
+        <div class="card-stack-summary" id="deps-summary"></div>
       </div>
 
-      <!-- Tool cards get injected here by renderer.js -->
-      <div id="tools-container"></div>
+      <!-- Apps Stack -->
+      <div class="card-stack-container" style="margin-top: 40px;">
+        <div class="card-stack-header">
+          <h3>Apps</h3>
+          <div class="card-stack-actions">
+            <button class="btn btn-sm" id="show-all-apps-btn" onclick="toggleStack('apps')">Show All</button>
+            <button class="btn btn-primary btn-sm" id="install-all-apps-btn" onclick="installAllApps()">Install All</button>
+          </div>
+        </div>
+        <div class="card-stack" id="apps-stack">
+          <button class="stack-nav prev" onclick="navigateStack('apps', -1)">‹</button>
+          <button class="stack-nav next" onclick="navigateStack('apps', 1)">›</button>
+          <div id="qol-container"></div>
+        </div>
+        <div class="card-stack-summary" id="apps-summary"></div>
+      </div>
+
     </div>
 
     <!-- ═══════ Accounts Tab ═══════ -->
@@ -60,16 +85,16 @@
 
       <!-- GitHub -->
       <div class="account-card">
-        <h3>🔑 GitHub</h3>
-        <p>GitHub is where your code lives. You'll push projects, collaborate with others, and clone repositories from here. You need an account and you need to be logged in via the CLI so <code>git push</code> works.</p>
+        <h3>🐙 GitHub</h3>
+        <p>GitHub is where your code lives. You need an account and you need to be logged in via the CLI so <code>git push</code> works.</p>
         <div class="step-list" id="github-steps">
           <div class="step-item">
             <span class="step-dot" id="gh-step-account">1</span>
-            <span>Create a GitHub account (if you don't have one)</span>
+            <span>Create a GitHub account</span>
           </div>
           <div class="step-item">
             <span class="step-dot" id="gh-step-cli">2</span>
-            <span>Install GitHub CLI (via Homebrew)</span>
+            <span>Install GitHub CLI (Dependencies tab)</span>
           </div>
           <div class="step-item">
             <span class="step-dot" id="gh-step-login">3</span>
@@ -78,7 +103,6 @@
         </div>
         <div class="account-actions">
           <button class="btn" onclick="openLink('https://github.com/signup')">Create Account ↗</button>
-          <button class="btn" onclick="installGhCli()">Install CLI</button>
           <button class="btn btn-primary" onclick="ghAuthLogin()">Authenticate</button>
         </div>
         <div class="terminal-output" id="gh-output" style="display: none;"></div>
@@ -97,11 +121,16 @@
             <span class="step-dot" id="claude-step-cli">2</span>
             <span>Install Claude CLI (from Dependencies tab)</span>
           </div>
+          <div class="step-item">
+            <span class="step-dot" id="claude-step-auth">3</span>
+            <span>Authenticate with <code>claude</code></span>
+          </div>
         </div>
         <div class="account-actions">
           <button class="btn" onclick="openLink('https://claude.ai/signup')">Create Claude Account ↗</button>
-          <button class="btn" onclick="openLink('https://console.anthropic.com/')">Anthropic Console ↗</button>
+          <button class="btn btn-primary" onclick="claudeAuth()">Authenticate</button>
         </div>
+        <div class="terminal-output" id="claude-output" style="display: none;"></div>
       </div>
     </div>
 

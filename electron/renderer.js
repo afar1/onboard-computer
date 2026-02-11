@@ -9,22 +9,32 @@
 
 const TOOLS = [
   {
+    id: 'xcode-cli',
+    name: 'Xcode CLI Tools',
+    icon: '🛠',
+    iconBg: '#1c7ed6',
+    iconColor: '#fff',
+    desc: 'Apple\'s command line developer tools. Compilers, git, and build essentials.',
+    explain: '<strong>Why:</strong> Xcode Command Line Tools include essential compilers (clang), git, make, and other build tools that everything else depends on. This is the foundation — Homebrew won\'t work without it.',
+    installCmd: 'xcode-select --install',
+    installNote: 'A dialog will appear. Click "Install" and wait for it to complete.',
+  },
+  {
     id: 'homebrew',
     name: 'Homebrew',
-    icon: '🍺',
-    iconBg: 'var(--yellow-dim)',
-    iconColor: 'var(--yellow)',
+    iconImg: 'assets/homebrew.svg',
+    iconBg: '#fbb040',
     desc: 'The package manager for macOS. Installs everything else.',
     explain: '<strong>Why:</strong> Homebrew is the standard way to install developer tools on macOS. Almost every other tool on this list can be installed through it. Think of it as the App Store for command-line tools.',
     installCmd: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
     installNote: 'This may take a few minutes and will ask for your password.',
+    dependsOn: 'xcode-cli',
   },
   {
     id: 'git',
     name: 'Git',
-    icon: '🔀',
-    iconBg: 'var(--red-dim)',
-    iconColor: 'var(--red)',
+    iconImg: 'assets/git.png',
+    iconBg: '#f0f0f0',
     desc: 'Version control. Track changes, collaborate, push to GitHub.',
     explain: '<strong>Why:</strong> Git is how every developer tracks code changes and collaborates. When you "push" code to GitHub or "pull" someone else\'s project, you\'re using Git. It\'s non-negotiable — every team, every project, everywhere.',
     installCmd: 'brew install git',
@@ -33,9 +43,8 @@ const TOOLS = [
   {
     id: 'node',
     name: 'Node.js',
-    icon: '🟢',
-    iconBg: 'var(--green-dim)',
-    iconColor: 'var(--green)',
+    iconImg: 'assets/nodejs.svg',
+    iconBg: '#333',
     desc: 'JavaScript runtime. Runs JS outside the browser, powers npm.',
     explain: '<strong>Why:</strong> Node.js lets you run JavaScript on your machine (not just in a browser). It comes with <strong>npm</strong>, the package manager that installs libraries for web projects. Most modern web development depends on Node.',
     installCmd: 'brew install node',
@@ -55,9 +64,8 @@ const TOOLS = [
   {
     id: 'bun',
     name: 'Bun',
-    icon: '🥟',
-    iconBg: 'rgba(188, 140, 255, 0.15)',
-    iconColor: 'var(--purple)',
+    iconImg: 'assets/bun.svg',
+    iconBg: '#fbf0df',
     desc: 'Fast JavaScript runtime and package manager. Drop-in npm replacement.',
     explain: '<strong>Why:</strong> Bun is a blazing-fast alternative to Node.js for running JavaScript and installing packages. Many newer projects use it for speed. It\'s optional but increasingly popular in the ecosystem.',
     installCmd: 'brew install oven-sh/bun/bun',
@@ -66,13 +74,107 @@ const TOOLS = [
   {
     id: 'claude',
     name: 'Claude CLI',
-    icon: '🤖',
-    iconBg: 'var(--blue-dim)',
-    iconColor: 'var(--blue)',
+    icon: '✦',
+    iconBg: '#d97706',
+    iconColor: '#fff',
     desc: 'AI coding assistant from Anthropic. Powers your pair programming.',
     explain: '<strong>Why:</strong> The Claude CLI gives you an AI coding partner right in your terminal. It can write code, explain errors, refactor, and debug alongside you. This is the engine behind the AI-assisted development workflow and the <code>field-theory</code> toolchain.',
     installCmd: 'npm install -g @anthropic-ai/claude-code',
     dependsOn: 'node',
+  },
+  {
+    id: 'gh',
+    name: 'GitHub CLI',
+    iconImg: 'assets/github.png',
+    iconBg: '#24292e',
+    desc: 'GitHub from the command line. Create PRs, issues, and manage repos.',
+    explain: '<strong>Why:</strong> The GitHub CLI (<code>gh</code>) lets you interact with GitHub without leaving your terminal. Create pull requests, view issues, trigger workflows, and authenticate Git — all from the command line.',
+    installCmd: 'brew install gh',
+    dependsOn: 'homebrew',
+  },
+  {
+    id: 'cursor-cli',
+    name: 'Cursor CLI',
+    iconImg: 'assets/Cursor.png',
+    iconBg: '#1a1a2e',
+    desc: 'Open projects in Cursor from the terminal with the <code>cursor</code> command.',
+    explain: '<strong>Why:</strong> The Cursor CLI lets you open files and folders in Cursor directly from your terminal, just like <code>code .</code> for VS Code. Run <code>cursor .</code> to open the current directory.',
+    installCmd: 'cursor --install-extension',
+    dependsOn: 'homebrew',
+  },
+];
+
+// ─── QOL Apps ──────────────────────────────────────────────────────
+// Quality-of-life macOS apps that make development more pleasant.
+// These are installed via Homebrew cask.
+
+const QOL_APPS = [
+  {
+    id: 'fieldtheory',
+    name: 'Field Theory',
+    iconImg: 'assets/fieldtheory-icon.png',
+    iconBg: '#1a1a2e',
+    desc: 'Local voice transcripts and context management.',
+    explain: '<strong>Why:</strong> Field Theory handles voice-to-text transcription locally on your device and manages context across your development workflow — keeping everything private and fast.',
+    installCmd: 'brew install --cask fieldtheory',
+    checkCmd: 'ls /Applications/Field\\ Theory.app',
+    dependsOn: 'homebrew',
+  },
+  {
+    id: 'cursor',
+    name: 'Cursor',
+    iconImg: 'assets/Cursor.png',
+    iconBg: '#1a1a2e',
+    desc: 'AI-powered code editor. VS Code fork with built-in AI assistance.',
+    explain: '<strong>Why:</strong> Cursor is a code editor built around AI — it has Claude and GPT built right in for code generation, editing, and chat. It\'s VS Code under the hood, so all your extensions work.',
+    installCmd: 'brew install --cask cursor',
+    checkCmd: 'ls /Applications/Cursor.app',
+    dependsOn: 'homebrew',
+  },
+  {
+    id: 'rectangle',
+    name: 'Rectangle',
+    iconImg: 'assets/Rectangle.png',
+    iconBg: 'var(--bg-tertiary)',
+    desc: 'Window management with keyboard shortcuts. Snap windows to edges.',
+    explain: '<strong>Why:</strong> macOS doesn\'t have built-in window snapping. Rectangle lets you tile windows with keyboard shortcuts (like ⌘⌥← for left half). Essential for multi-window workflows.',
+    installCmd: 'brew install --cask rectangle',
+    checkCmd: 'ls /Applications/Rectangle.app',
+    dependsOn: 'homebrew',
+  },
+  {
+    id: 'alfred',
+    name: 'Alfred',
+    iconImg: 'assets/Alfred-5.png',
+    iconBg: 'var(--bg-tertiary)',
+    desc: 'Spotlight replacement with workflows, snippets, and clipboard history.',
+    explain: '<strong>Why:</strong> Alfred is a supercharged launcher. Beyond just opening apps, it has clipboard history, text expansion, custom workflows, and integrations with everything. Most power users can\'t live without it.',
+    installCmd: 'brew install --cask alfred',
+    checkCmd: 'ls /Applications/Alfred\\ 5.app || ls /Applications/Alfred\\ 4.app || ls "/Applications/Alfred.app"',
+    dependsOn: 'homebrew',
+  },
+  {
+    id: 'caffeine',
+    name: 'Caffeine',
+    iconImg: 'assets/Caffeine.png',
+    iconBg: 'var(--bg-tertiary)',
+    desc: 'Keeps your Mac awake. One click to prevent sleep.',
+    explain: '<strong>Why:</strong> When you\'re running long builds, presentations, or just don\'t want your screen dimming, Caffeine sits in your menu bar and keeps your Mac awake with a single click.',
+    installCmd: 'brew install --cask caffeine',
+    checkCmd: 'ls /Applications/Caffeine.app',
+    dependsOn: 'homebrew',
+  },
+  {
+    id: 'xcode',
+    name: 'Xcode',
+    icon: '🔨',
+    iconBg: '#1c7ed6',
+    iconColor: '#fff',
+    desc: 'Apple\'s full IDE. Required for iOS/macOS development.',
+    explain: '<strong>Why:</strong> The full Xcode app is needed if you\'re building iOS or macOS apps, or if you need simulators. It\'s large (~12GB) so only install if you need it.',
+    installCmd: 'open "macappstore://apps.apple.com/app/xcode/id497799835"',
+    checkCmd: 'ls /Applications/Xcode.app',
+    dependsOn: 'homebrew',
   },
 ];
 
@@ -83,6 +185,80 @@ const toolStates = {};
 TOOLS.forEach(t => {
   toolStates[t.id] = { status: 'unchecked', installed: false, version: null };
 });
+
+const qolStates = {};
+QOL_APPS.forEach(t => {
+  qolStates[t.id] = { status: 'unchecked', installed: false };
+});
+
+// Stack state
+const stackState = {
+  deps: { currentIndex: 0, expanded: false },
+  apps: { currentIndex: 0, expanded: false },
+};
+
+// ─── Theme Toggle ──────────────────────────────────────────────────
+
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('theme-dark').classList.toggle('active', theme === 'dark');
+  document.getElementById('theme-light').classList.toggle('active', theme === 'light');
+  localStorage.setItem('theme', theme);
+}
+
+function initTheme() {
+  const saved = localStorage.getItem('theme') || 'dark';
+  setTheme(saved);
+}
+
+// ─── Stack Navigation ──────────────────────────────────────────────
+
+function toggleStack(stackId) {
+  const stack = stackState[stackId];
+  stack.expanded = !stack.expanded;
+
+  const containerId = stackId === 'deps' ? 'tools-stack' : 'apps-stack';
+  const container = document.getElementById(containerId);
+  const btn = document.getElementById(`show-all-${stackId}-btn`);
+
+  if (stack.expanded) {
+    container.classList.add('expanded');
+    btn.textContent = 'Collapse';
+  } else {
+    container.classList.remove('expanded');
+    btn.textContent = 'Show All';
+  }
+
+  if (stackId === 'deps') renderToolCards();
+  else renderQolCards();
+}
+
+function navigateStack(stackId, direction) {
+  const stack = stackState[stackId];
+  const items = stackId === 'deps' ? TOOLS : QOL_APPS;
+
+  stack.currentIndex = Math.max(0, Math.min(items.length - 1, stack.currentIndex + direction));
+
+  if (stackId === 'deps') renderToolCards();
+  else renderQolCards();
+
+  updateStackSummary(stackId);
+}
+
+function updateStackSummary(stackId) {
+  const stack = stackState[stackId];
+  const items = stackId === 'deps' ? TOOLS : QOL_APPS;
+  const states = stackId === 'deps' ? toolStates : qolStates;
+
+  const installed = items.filter(t => states[t.id].installed).length;
+  const summary = document.getElementById(`${stackId}-summary`);
+
+  if (stack.expanded) {
+    summary.textContent = '';
+  } else {
+    summary.textContent = `${stack.currentIndex + 1} of ${items.length} · ${installed}/${items.length} installed`;
+  }
+}
 
 let homeDir = '';
 let devFolderPath = '';
@@ -111,16 +287,32 @@ function renderToolCards() {
   const container = document.getElementById('tools-container');
   container.innerHTML = '';
 
-  TOOLS.forEach(tool => {
+  const { currentIndex, expanded } = stackState.deps;
+
+  // Reorder tools so current item is first when stacked
+  let orderedTools = [...TOOLS];
+  if (!expanded) {
+    orderedTools = [
+      ...TOOLS.slice(currentIndex),
+      ...TOOLS.slice(0, currentIndex)
+    ];
+  }
+
+  orderedTools.forEach((tool, idx) => {
     const state = toolStates[tool.id];
     const isExpanded = expandedPanels.has(tool.id);
     const card = document.createElement('div');
     card.className = 'tool-card fade-in';
     card.id = `tool-${tool.id}`;
+    card.setAttribute('data-index', idx);
+
+    const iconHtml = tool.iconImg
+      ? `<div class="tool-icon" style="background: ${tool.iconBg}; padding: 4px;"><img src="${tool.iconImg}" style="width: 100%; height: 100%; object-fit: contain;"></div>`
+      : `<div class="tool-icon" style="background: ${tool.iconBg}; color: ${tool.iconColor || '#fff'};">${tool.icon}</div>`;
 
     card.innerHTML = `
       <div class="tool-card-header">
-        <div class="tool-icon" style="background: ${tool.iconBg}; color: ${tool.iconColor};">${tool.icon}</div>
+        ${iconHtml}
         <div class="tool-info">
           <div class="tool-name">
             ${tool.name}
@@ -193,6 +385,215 @@ function renderToolAction(tool, state) {
     return `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); installTool('${tool.id}')">Install</button>`;
   }
   return '';
+}
+
+// ─── Render QOL App Cards ──────────────────────────────────────────
+
+function renderQolCards() {
+  const container = document.getElementById('qol-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const { currentIndex, expanded } = stackState.apps;
+
+  // Reorder apps so current item is first when stacked
+  let orderedApps = [...QOL_APPS];
+  if (!expanded) {
+    orderedApps = [
+      ...QOL_APPS.slice(currentIndex),
+      ...QOL_APPS.slice(0, currentIndex)
+    ];
+  }
+
+  orderedApps.forEach((app, idx) => {
+    const state = qolStates[app.id];
+    const isExpanded = expandedPanels.has('qol-' + app.id);
+    const card = document.createElement('div');
+    card.className = 'tool-card fade-in';
+    card.id = `qol-${app.id}`;
+    card.setAttribute('data-index', idx);
+
+    const iconHtml = app.iconImg
+      ? `<div class="tool-icon" style="background: ${app.iconBg}; padding: 0;"><img src="${app.iconImg}" style="width: 100%; height: 100%; object-fit: contain;"></div>`
+      : `<div class="tool-icon" style="background: ${app.iconBg}; color: ${app.iconColor || '#fff'};">${app.icon}</div>`;
+
+    card.innerHTML = `
+      <div class="tool-card-header">
+        ${iconHtml}
+        <div class="tool-info">
+          <div class="tool-name">
+            ${app.name}
+            ${renderStatusBadge(state)}
+          </div>
+          <div class="tool-desc">${app.desc}</div>
+        </div>
+        <div class="tool-action">
+          ${renderQolAction(app, state)}
+        </div>
+      </div>
+      <div class="tool-details" id="details-qol-${app.id}" style="display: ${isExpanded ? 'block' : 'none'};">
+        <div class="tool-explain">${app.explain}</div>
+        ${app.installCmd ? `
+          <div class="install-command">
+            <code>${escapeHtml(app.installCmd)}</code>
+            <button class="copy-btn" onclick="copyToClipboard(\`${app.installCmd.replace(/`/g, '\\`')}\`, this)" title="Copy command">📋</button>
+          </div>
+        ` : ''}
+        <div class="terminal-output" id="output-qol-${app.id}" style="display: none;"></div>
+      </div>
+    `;
+
+    card.querySelector('.tool-card-header').addEventListener('click', (e) => {
+      if (e.target.closest('button')) return;
+      const key = 'qol-' + app.id;
+      if (expandedPanels.has(key)) {
+        expandedPanels.delete(key);
+      } else {
+        expandedPanels.add(key);
+      }
+      const details = card.querySelector('.tool-details');
+      details.style.display = expandedPanels.has(key) ? 'block' : 'none';
+    });
+
+    container.appendChild(card);
+  });
+}
+
+function renderQolAction(app, state) {
+  if (state.status === 'checking' || state.status === 'installing') {
+    return '<span class="spinner"></span>';
+  }
+  if (state.installed) {
+    return '<span style="color: var(--green); font-size: 18px;">✓</span>';
+  }
+  if (state.status === 'checked' && !state.installed) {
+    if (app.dependsOn && !toolStates[app.dependsOn]?.installed) {
+      return `<button class="btn btn-sm" disabled>Needs Homebrew</button>`;
+    }
+    return `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); installQolApp('${app.id}')">Install</button>`;
+  }
+  return '';
+}
+
+async function checkQolApps() {
+  for (const app of QOL_APPS) {
+    qolStates[app.id].status = 'checking';
+    renderQolCards();
+
+    try {
+      const result = await window.onboard.run(app.checkCmd);
+      qolStates[app.id] = {
+        status: 'checked',
+        installed: result.succeeded,
+      };
+    } catch (err) {
+      qolStates[app.id] = { status: 'checked', installed: false };
+    }
+
+    renderQolCards();
+  }
+}
+
+async function installQolApp(appId) {
+  const app = QOL_APPS.find(a => a.id === appId);
+  if (!app) return;
+
+  if (app.dependsOn && !toolStates[app.dependsOn]?.installed) {
+    alert('You need to install Homebrew first.');
+    return;
+  }
+
+  qolStates[appId].status = 'installing';
+  expandedPanels.add('qol-' + appId);
+  renderQolCards();
+
+  const output = document.getElementById(`output-qol-${appId}`);
+  if (output) {
+    output.style.display = 'block';
+    output.innerHTML = `<span class="cmd">$ ${escapeHtml(app.installCmd)}</span>\n`;
+  }
+
+  setStatus(`Installing ${app.name}...`);
+
+  try {
+    window.onboard.setStreamCallback((data) => {
+      if (output) {
+        const cls = data.stream === 'stderr' ? 'err' : '';
+        output.innerHTML += `<span class="${cls}">${escapeHtml(data.data)}</span>`;
+        output.scrollTop = output.scrollHeight;
+      }
+    });
+
+    const result = await window.onboard.runStreaming(app.installCmd);
+    window.onboard.clearStreamCallback();
+
+    if (result.succeeded) {
+      qolStates[appId] = { status: 'checked', installed: true };
+      if (output) {
+        output.innerHTML += `\n<span class="info">✓ ${app.name} installed successfully.</span>`;
+      }
+    } else {
+      qolStates[appId].status = 'checked';
+      if (output) {
+        output.innerHTML += `\n<span class="err">✗ Installation failed (exit code ${result.exitCode}).</span>`;
+      }
+    }
+  } catch (err) {
+    window.onboard.clearStreamCallback();
+    qolStates[appId].status = 'checked';
+    if (output) {
+      output.innerHTML += `\n<span class="err">Error: ${escapeHtml(err.message)}</span>`;
+    }
+  }
+
+  renderQolCards();
+  setStatus('');
+}
+
+// ─── Install All Functions ─────────────────────────────────────────
+
+async function installAllDeps() {
+  const btn = document.getElementById('install-all-deps-btn');
+  btn.disabled = true;
+  btn.textContent = 'Installing...';
+
+  // Install in order, respecting dependencies
+  for (const tool of TOOLS) {
+    if (toolStates[tool.id].installed) continue;
+
+    // Check if dependency is met
+    if (tool.dependsOn && !toolStates[tool.dependsOn].installed) {
+      continue; // Skip if dependency not met (will be installed in order)
+    }
+
+    await installTool(tool.id);
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Install All';
+  updateOverallStatus();
+}
+
+async function installAllApps() {
+  const btn = document.getElementById('install-all-apps-btn');
+  btn.disabled = true;
+  btn.textContent = 'Installing...';
+
+  // Check if Homebrew is installed first
+  if (!toolStates['homebrew']?.installed) {
+    alert('Please install Homebrew first from the Dependencies section.');
+    btn.disabled = false;
+    btn.textContent = 'Install All';
+    return;
+  }
+
+  for (const app of QOL_APPS) {
+    if (qolStates[app.id].installed) continue;
+    await installQolApp(app.id);
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Install All';
 }
 
 // ─── Check Dependencies ────────────────────────────────────────────
@@ -306,12 +707,10 @@ async function installTool(toolId) {
 function updateProgress() {
   const total = TOOLS.length;
   const installed = TOOLS.filter(t => toolStates[t.id].installed).length;
-  const pct = Math.round((installed / total) * 100);
 
-  document.getElementById('deps-progress').style.width = pct + '%';
-  document.getElementById('deps-progress-label').textContent = `${installed}/${total} installed`;
+  document.getElementById('deps-progress-label').textContent = `${installed}/${total}`;
 
-  // Update the badge on the Dependencies tab.
+  // Update the badge on the Setup tab.
   const badge = document.getElementById('deps-badge');
   if (installed === total) {
     badge.className = 'tab-badge complete';
@@ -320,6 +719,9 @@ function updateProgress() {
     badge.className = 'tab-badge pending';
     badge.textContent = `${installed}/${total}`;
   }
+
+  updateStackSummary('deps');
+  updateStackSummary('apps');
 }
 
 function updateOverallStatus() {
@@ -339,27 +741,6 @@ function setStatus(text) {
 }
 
 // ─── Accounts Tab Logic ────────────────────────────────────────────
-
-async function installGhCli() {
-  const output = document.getElementById('gh-output');
-  output.style.display = 'block';
-  output.innerHTML = '<span class="cmd">$ brew install gh</span>\n';
-
-  window.onboard.setStreamCallback((data) => {
-    output.innerHTML += escapeHtml(data.data);
-    output.scrollTop = output.scrollHeight;
-  });
-
-  const result = await window.onboard.runStreaming('brew install gh');
-  window.onboard.clearStreamCallback();
-
-  if (result.succeeded) {
-    output.innerHTML += '\n<span class="info">✓ GitHub CLI installed.</span>';
-    markStep('gh-step-cli');
-  } else {
-    output.innerHTML += `\n<span class="err">✗ Failed. ${escapeHtml(result.stderr)}</span>`;
-  }
-}
 
 async function ghAuthLogin() {
   const output = document.getElementById('gh-output');
@@ -562,20 +943,71 @@ async function checkGitHubAuth() {
   }
 }
 
+async function checkClaudeAuth() {
+  // Check if Claude CLI exists.
+  const claudeCliCheck = await window.onboard.run('which claude');
+  if (claudeCliCheck.succeeded) {
+    markStep('claude-step-cli');
+  }
+
+  // Check if authenticated by looking for credentials.
+  // Claude CLI stores auth in ~/.claude/ directory.
+  const authCheck = await window.onboard.run('test -d ~/.claude && test -f ~/.claude/.credentials.json && echo "authenticated"');
+  if (authCheck.succeeded && authCheck.stdout.includes('authenticated')) {
+    markStep('claude-step-auth');
+    markStep('claude-step-account');
+  }
+}
+
+async function claudeAuth() {
+  const output = document.getElementById('claude-output');
+  output.style.display = 'block';
+  output.innerHTML = '<span class="cmd">$ claude</span>\n';
+  output.innerHTML += '<span class="info">Opening Claude CLI for authentication...</span>\n';
+  output.innerHTML += '<span class="info">This will open a browser window. Complete the login there.</span>\n';
+
+  // Launch claude which will prompt for auth if not authenticated.
+  // We use a simple invocation that will trigger the auth flow.
+  const result = await window.onboard.run('claude --version 2>&1');
+  output.innerHTML += escapeHtml(result.stdout || result.stderr) + '\n';
+
+  // Re-check auth status.
+  await checkClaudeAuth();
+
+  const authCheck = await window.onboard.run('test -f ~/.claude/.credentials.json && echo "ok"');
+  if (authCheck.succeeded && authCheck.stdout.includes('ok')) {
+    output.innerHTML += '\n<span class="info">✓ Claude CLI is authenticated!</span>';
+  } else {
+    output.innerHTML += '\n<span class="info">Run "claude" in your terminal to complete authentication.</span>';
+  }
+}
+
 // ─── Init ──────────────────────────────────────────────────────────
 // Entry point. Fetches home dir, renders the UI, runs initial checks.
 
 async function init() {
+  initTheme();
   homeDir = await window.onboard.homedir();
 
   renderToolCards();
+  renderQolCards();
+  updateStackSummary('deps');
+  updateStackSummary('apps');
   setStatus('Scanning your machine...');
 
   // Run dependency checks automatically on launch.
   await checkAllDependencies();
 
-  // Check GitHub auth status in the background.
+  // Check QOL apps in parallel.
+  checkQolApps();
+
+  // Check auth status in the background.
   checkGitHubAuth();
+  checkClaudeAuth();
+
+  // Update summaries after checks
+  updateStackSummary('deps');
+  updateStackSummary('apps');
 }
 
 init();
