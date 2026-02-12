@@ -118,6 +118,18 @@
       color: var(--accent);
     }
 
+    .demo-video {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 24px 48px;
+    }
+
+    .demo-video video {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
     .configs {
       border-top: 1px solid var(--border);
       padding: 48px 24px;
@@ -215,8 +227,8 @@
       font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
       color: var(--text);
-      overflow-x: auto;
-      white-space: nowrap;
+      white-space: pre-wrap;
+      word-break: break-all;
       margin-bottom: 12px;
     }
 
@@ -260,6 +272,10 @@
     <p class="meta">
       Free and open source · <a href="https://github.com/afar1/onboard">View source</a>
     </p>
+  </section>
+
+  <section class="demo-video">
+    <video src="/demo.mp4" autoplay muted loop playsinline></video>
   </section>
 
   <section class="configs">
