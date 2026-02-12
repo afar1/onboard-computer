@@ -804,10 +804,7 @@ async function cancelInstall(appId) {
   setStatus('Installation cancelled');
 }
 
-async function openApp(appId) {
-  const app = (currentConfig?.apps || []).find(a => a.id === appId);
-  if (!app) return;
-
+async function resolveAppPath(app) {
   // Try to find the app path from the check command
   // Most apps have check: "ls /Applications/AppName.app"
   const checkCmd = app.check || '';
@@ -818,39 +815,24 @@ async function openApp(appId) {
     const paths = appPathMatch[1].split('||').map(p => p.trim().replace(/\\/g, ''));
     for (const appPath of paths) {
       const exists = await window.onboard.run(`ls "${appPath}"`);
-      if (exists.succeeded) {
-        await window.onboard.openPath(appPath);
-        return;
-      }
+      if (exists.succeeded) return appPath;
     }
   }
 
-  // Fallback: try standard Applications path with app name
-  const standardPath = `/Applications/${app.name}.app`;
-  await window.onboard.openPath(standardPath);
+  // Fallback: standard Applications path
+  return `/Applications/${app.name}.app`;
+}
+
+async function openApp(appId) {
+  const app = (currentConfig?.apps || []).find(a => a.id === appId);
+  if (!app) return;
+  await window.onboard.openPath(await resolveAppPath(app));
 }
 
 async function showAppInFinder(appId) {
   const app = (currentConfig?.apps || []).find(a => a.id === appId);
   if (!app) return;
-
-  const checkCmd = app.check || '';
-  const appPathMatch = checkCmd.match(/ls\s+(.+\.app)/);
-
-  if (appPathMatch) {
-    const paths = appPathMatch[1].split('||').map(p => p.trim().replace(/\\/g, ''));
-    for (const appPath of paths) {
-      const exists = await window.onboard.run(`ls "${appPath}"`);
-      if (exists.succeeded) {
-        await window.onboard.showInFinder(appPath);
-        return;
-      }
-    }
-  }
-
-  // Fallback: try standard Applications path
-  const standardPath = `/Applications/${app.name}.app`;
-  await window.onboard.showInFinder(standardPath);
+  await window.onboard.showInFinder(await resolveAppPath(app));
 }
 
 function uninstallApp(appId) {
