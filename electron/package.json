@@ -1,7 +1,7 @@
 {
   "name": "onboard-computer",
   "productName": "onboard.computer",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Developer onboarding — get your machine ready to build.",
   "main": "main.js",
   "scripts": {
@@ -51,6 +51,12 @@
     "files": [
       "**/*",
       "!examples/**"
+    ],
+    "extraResources": [
+      {
+        "from": "examples/default.onboard",
+        "to": "default.onboard"
+      }
     ]
   }
 }

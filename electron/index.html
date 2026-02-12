@@ -14,12 +14,6 @@
   <div class="drag-region">
     <span class="title-text">onboard.computer</span>
     <span class="config-name" id="title-config-name"></span>
-    <div class="title-actions" style="-webkit-app-region: no-drag;">
-      <div class="theme-toggle">
-        <button id="theme-dark" class="active" onclick="setTheme('dark')">Dark</button>
-        <button id="theme-light" onclick="setTheme('light')">Light</button>
-      </div>
-    </div>
   </div>
 
   <!-- Empty state: centered drop zone -->
@@ -44,6 +38,7 @@
       <div class="config-info">
         <h2 id="config-name-display">Config Name</h2>
         <p id="config-description"></p>
+        <p class="config-path" id="config-path"></p>
       </div>
       <button class="btn btn-sm" onclick="resetConfig()">Clear</button>
     </div>
@@ -54,7 +49,7 @@
         <h3>System Dependencies</h3>
         <div class="section-actions">
           <span class="progress-label" id="deps-progress-label"></span>
-          <button class="btn btn-primary btn-sm" id="install-all-deps-btn" onclick="installAllDeps()">Install All</button>
+          <button class="btn btn-primary btn-sm" id="install-all-deps-btn" onclick="installAllDeps()">Install Dependencies</button>
         </div>
       </div>
       <div id="tools-container" class="cards-container"></div>
@@ -66,7 +61,7 @@
         <h3>Apps</h3>
         <div class="section-actions">
           <span class="progress-label" id="apps-progress-label"></span>
-          <button class="btn btn-primary btn-sm" id="install-all-apps-btn" onclick="installAllApps()">Install All</button>
+          <button class="btn btn-primary btn-sm" id="install-all-apps-btn" onclick="installAllApps()">Install Apps</button>
         </div>
       </div>
       <div id="apps-container" class="cards-container"></div>
@@ -74,11 +69,40 @@
 
   </div><!-- end main-content -->
 
+  <!-- Activity log popup -->
+  <div class="activity-log-popup" id="activity-log-popup" style="display: none;">
+    <div class="activity-log-header">
+      <span>Activity Log</span>
+      <button class="activity-log-close" onclick="toggleActivityLog()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <ul class="activity-log-list" id="activity-log-list"></ul>
+  </div>
+
   <!-- Bottom action bar -->
   <div class="action-bar">
-    <span class="action-bar-text" id="status-text">Starting up...</span>
-    <div class="update-section" id="update-section"></div>
-    <button class="btn btn-primary" id="check-all-btn" onclick="checkAllTools()">Check All</button>
+    <div class="action-bar-left">
+      <button class="icon-btn" id="file-picker-btn" onclick="openFilePicker()" title="Open config file">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+        </svg>
+      </button>
+      <span class="action-bar-text clickable" id="status-text" onclick="toggleActivityLog()">Starting up...</span>
+    </div>
+    <div class="action-bar-right">
+      <button class="icon-btn theme-icon-btn" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle theme">
+        <svg id="theme-icon-sun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <svg id="theme-icon-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <div class="update-section" id="update-section"></div>
+    </div>
   </div>
 
   <!-- Release notes popup -->
@@ -101,10 +125,36 @@
     <ul class="release-notes-list" id="release-notes-list"></ul>
   </div>
 
+  <!-- Uninstall confirmation modal -->
+  <div class="modal-overlay" id="uninstall-modal" style="display: none;">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Uninstall <span id="uninstall-name"></span>?</h3>
+      </div>
+      <div class="modal-body">
+        <p id="uninstall-warning"></p>
+        <p class="modal-confirm-text">Type <strong>delete</strong> to confirm:</p>
+        <input type="text" class="modal-input" id="uninstall-confirm-input" placeholder="delete" autocomplete="off" oninput="onUninstallInputChange()" onkeydown="if(event.key==='Enter' && !document.getElementById('uninstall-confirm-btn').disabled) confirmUninstall()">
+      </div>
+      <div class="modal-actions">
+        <button class="btn" onclick="hideUninstallModal()">Cancel</button>
+        <button class="btn btn-danger" id="uninstall-confirm-btn" onclick="confirmUninstall()" disabled>Uninstall</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Error toast -->
   <div class="error-toast" id="error-toast" style="display: none;">
-    <span id="error-message"></span>
-    <button class="toast-close" onclick="hideError()">&times;</button>
+    <div class="error-content">
+      <span id="error-message"></span>
+      <div class="error-details" id="error-details" style="display: none;">
+        <pre id="error-details-text"></pre>
+      </div>
+    </div>
+    <div class="error-actions">
+      <button class="error-details-btn" id="error-details-btn" onclick="toggleErrorDetails()" style="display: none;">Details</button>
+      <button class="toast-close" onclick="hideError()">&times;</button>
+    </div>
   </div>
 
 </div>

@@ -22,6 +22,12 @@ ipcRenderer.on('config:fileOpened', (_event, filePath) => {
   if (fileOpenedCallback) fileOpenedCallback(filePath);
 });
 
+// Track terminal window close callbacks
+let terminalWindowClosedCallback = null;
+ipcRenderer.on('terminal:windowClosed', (_event, id) => {
+  if (terminalWindowClosedCallback) terminalWindowClosedCallback(id);
+});
+
 // ─── Updater Event Callbacks ────────────────────────────────────────
 let updaterCallbacks = {
   onCheckingForUpdate: null,
@@ -79,6 +85,15 @@ contextBridge.exposeInMainWorld('onboard', {
   // Run a command with streaming output (for long installs).
   runStreaming: (command) => ipcRenderer.invoke('shell:runStreaming', command),
 
+  // Run a command with streaming output and process ID for cancellation.
+  runStreamingWithId: (command, id) => ipcRenderer.invoke('shell:runStreamingWithId', command, id),
+
+  // Cancel a running process by ID.
+  cancelProcess: (id) => ipcRenderer.invoke('shell:cancelProcess', id),
+
+  // Open a path (app, file, or folder) with the default handler.
+  openPath: (path) => ipcRenderer.invoke('shell:openPath', path),
+
   // Set the callback that receives streaming output chunks.
   setStreamCallback: (callback) => {
     currentStreamCallback = callback;
@@ -107,4 +122,14 @@ contextBridge.exposeInMainWorld('onboard', {
 
   // Get the file path from a dropped file (needed with contextIsolation)
   getFilePath: (file) => webUtils.getPathForFile(file),
+
+  // Open a file dialog to select a .onboard file.
+  openFileDialog: () => ipcRenderer.invoke('dialog:openFile'),
+
+  // Terminal window functions
+  openTerminalWindow: (id, name, existingOutput) => ipcRenderer.invoke('terminal:openWindow', id, name, existingOutput),
+  sendToTerminalWindow: (id, data, stream) => ipcRenderer.invoke('terminal:sendOutput', id, data, stream),
+  onTerminalWindowClosed: (callback) => {
+    terminalWindowClosedCallback = callback;
+  },
 });

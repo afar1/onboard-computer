@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terminal</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0d1117;
+      color: #e6edf3;
+      font-family: 'SF Mono', 'Fira Code', Menlo, monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .terminal {
+      height: 100%;
+      padding: 12px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .stdout {
+      color: #8b949e;
+    }
+
+    .stderr {
+      color: #f85149;
+    }
+  </style>
+</head>
+<body>
+  <div class="terminal" id="terminal"></div>
+  <script>
+    const terminal = document.getElementById('terminal');
+
+    window.terminalAPI.onOutput((data, stream) => {
+      const span = document.createElement('span');
+      span.className = stream;
+      span.textContent = data;
+      terminal.appendChild(span);
+      terminal.scrollTop = terminal.scrollHeight;
+    });
+  </script>
+</body>
+</html>

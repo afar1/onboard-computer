@@ -1,5 +1,5 @@
 schema_version: 1
-name: "Field Theory Standard"
+name: "Builder Basics"
 description: "Everything you need to start building"
 
 dependencies:

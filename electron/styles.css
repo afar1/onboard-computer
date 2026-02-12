@@ -249,6 +249,13 @@ html, body {
   font-size: 13px;
 }
 
+.config-path {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
 /* ─── Main Content ───────────────────────────────────────────────── */
 
 .main-content {
@@ -303,13 +310,19 @@ html, body {
   border-radius: var(--radius-sm);
   padding: 12px;
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  gap: 0;
   transition: border-color 0.15s;
 }
 
 .tool-card:hover {
   border-color: var(--border);
+}
+
+.tool-card-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .tool-icon {
@@ -424,6 +437,129 @@ html, body {
   font-size: 11px;
 }
 
+.btn-open {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+
+.btn-open:hover {
+  opacity: 0.9;
+  background: var(--green);
+}
+
+/* ─── Install Progress ───────────────────────────────────────────── */
+
+.install-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.install-spinner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.progress-bar {
+  width: 60px;
+  height: 6px;
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-shimmer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--blue) 50%,
+    transparent 100%
+  );
+  animation: progress-shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes progress-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.cancel-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  background: var(--red-dim);
+  border: none;
+  border-radius: 4px;
+  color: var(--red);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.cancel-btn:hover {
+  background: var(--red);
+  color: #fff;
+}
+
+/* ─── Tool Actions (Upgrade/Uninstall) ───────────────────────────── */
+
+.tool-actions,
+.app-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-upgrade {
+  background: var(--blue-dim);
+  border-color: var(--blue);
+  color: var(--blue);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-upgrade:hover {
+  background: var(--blue);
+  color: #fff;
+}
+
+.btn-uninstall {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text-muted);
+  padding: 4px 6px;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.tool-card:hover .btn-uninstall {
+  opacity: 1;
+}
+
+.btn-uninstall:hover {
+  background: var(--red-dim);
+  border-color: var(--red);
+  color: var(--red);
+}
+
+/* ─── Update Available Badge ─────────────────────────────────────── */
+
+.status-badge.update-available {
+  background: var(--blue-dim);
+  color: var(--blue);
+}
+
 /* ─── Drop Zone ──────────────────────────────────────────────────── */
 
 .config-drop-zone {
@@ -496,15 +632,51 @@ html, body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
+  padding: 10px 16px;
   background: var(--bg-secondary);
   border-top: 1px solid var(--border);
   flex-shrink: 0;
 }
 
+.action-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .action-bar-text {
   font-size: 12px;
   color: var(--text-secondary);
+}
+
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.icon-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.theme-icon-btn svg {
+  transition: transform 0.2s;
 }
 
 /* ─── Error Toast ────────────────────────────────────────────────── */
@@ -517,13 +689,59 @@ html, body {
   background: var(--red-dim);
   border: 1px solid var(--red);
   color: var(--red);
-  padding: 10px 16px;
-  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
   font-size: 12px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   z-index: 100;
+  max-width: 500px;
+}
+
+.error-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.error-details {
+  margin-top: 8px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.error-details pre {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: var(--red);
+}
+
+.error-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.error-details-btn {
+  background: transparent;
+  border: 1px solid var(--red);
+  color: var(--red);
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.error-details-btn:hover {
+  background: var(--red);
+  color: #fff;
 }
 
 .toast-close {
@@ -533,9 +751,284 @@ html, body {
   font-size: 16px;
   cursor: pointer;
   padding: 0;
+  line-height: 1;
 }
 
-/* ─── Terminal Output ────────────────────────────────────────────── */
+/* ─── Modal ──────────────────────────────────────────────────────── */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  width: 360px;
+  max-width: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.modal-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.modal-header h3 {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.modal-body {
+  padding: 16px;
+}
+
+.modal-body p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.modal-confirm-text {
+  font-size: 12px;
+  margin-top: 16px;
+}
+
+.modal-input {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--bg-code);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.modal-input:focus {
+  outline: none;
+  border-color: var(--blue);
+}
+
+.modal-actions {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.btn-danger {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+}
+
+.btn-danger:hover {
+  opacity: 0.9;
+}
+
+.btn-danger:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ─── Activity Log Popup ─────────────────────────────────────────── */
+
+.activity-log-popup {
+  position: fixed;
+  bottom: 52px;
+  left: 16px;
+  width: 280px;
+  max-height: 300px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  overflow: hidden;
+}
+
+.activity-log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.activity-log-close {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+}
+
+.activity-log-close:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.activity-log-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.activity-log-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 11px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.activity-log-list li:last-child {
+  border-bottom: none;
+}
+
+.activity-log-list li.failed {
+  color: var(--red);
+}
+
+.activity-log-list .activity-icon {
+  width: 16px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.activity-log-list .activity-text {
+  flex: 1;
+  color: var(--text-primary);
+}
+
+.activity-log-list li.failed .activity-text {
+  color: var(--red);
+}
+
+.activity-log-list .activity-time {
+  color: var(--text-muted);
+  font-size: 10px;
+}
+
+.activity-log-list .activity-empty {
+  color: var(--text-muted);
+  text-align: center;
+  padding: 20px;
+}
+
+.action-bar-text.clickable {
+  cursor: pointer;
+}
+
+.action-bar-text.clickable:hover {
+  color: var(--text-primary);
+}
+
+/* ─── Inline Terminal ────────────────────────────────────────────── */
+
+.terminal-inline {
+  margin-top: 10px;
+  background: var(--bg-code);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.terminal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-light);
+  min-height: 28px;
+}
+
+.terminal-last-line {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.terminal-last-line.stderr {
+  color: var(--red);
+}
+
+.terminal-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.terminal-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.terminal-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* terminal-history-btn inherits styles from btn btn-sm btn-uninstall */
+
+.terminal-full {
+  display: none;
+  padding: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  max-height: 150px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.terminal-inline.expanded .terminal-full {
+  display: block;
+}
+
+.terminal-inline.expanded .terminal-last-line {
+  display: none;
+}
+
+/* ─── Terminal Output (legacy) ───────────────────────────────────── */
 
 .terminal-output {
   background: var(--bg-code);
