@@ -829,30 +829,6 @@ async function revealAppInFinder(appId) {
   await window.onboard.showInFolder(await resolveAppPath(app));
 }
 
-async function revealAppInFinder(appId) {
-  const app = (currentConfig?.apps || []).find(a => a.id === appId);
-  if (!app) return;
-
-  // Try to find the app path from the check command
-  const checkCmd = app.check || '';
-  const appPathMatch = checkCmd.match(/ls\s+(.+\.app)/);
-
-  if (appPathMatch) {
-    const paths = appPathMatch[1].split('||').map(p => p.trim().replace(/\\/g, ''));
-    for (const appPath of paths) {
-      const exists = await window.onboard.run(`ls "${appPath}"`);
-      if (exists.succeeded) {
-        await window.onboard.showInFolder(appPath);
-        return;
-      }
-    }
-  }
-
-  // Fallback: try standard Applications path
-  const standardPath = `/Applications/${app.name}.app`;
-  await window.onboard.showInFolder(standardPath);
-}
-
 function uninstallApp(appId) {
   const app = (currentConfig?.apps || []).find(a => a.id === appId);
   if (!app) return;
