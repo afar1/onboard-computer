@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>onboard.computer</title>
-  <meta name="description" content="Get your machine ready to build. Install dev tools and apps with a single config file.">
+  <meta name="description" content="Set up your Mac so you can start building with AI in minutes. A single config file installs every dependency, runtime, and app your project needs.">
   <link rel="icon" type="image/svg+xml" href="/icon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -55,7 +55,8 @@
       line-height: 1.15;
       color: var(--accent);
       white-space: pre;
-      text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+      text-shadow: 0 0 10px currentColor;
+      opacity: 0.4;
     }
 
     .logo {
@@ -70,18 +71,18 @@
     }
 
     h1 {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 500;
-      line-height: 1.3;
+      line-height: 1.35;
       margin-bottom: 16px;
-      max-width: 500px;
+      max-width: 520px;
     }
 
     .tagline {
       font-size: 13px;
       color: var(--text-dim);
       margin-bottom: 28px;
-      max-width: 400px;
+      max-width: 460px;
       line-height: 1.6;
     }
 
@@ -222,8 +223,8 @@
       <pre id="ascii-animation"></pre>
     </div>
     <div class="logo"><span>&gt;</span> onboard.computer</div>
-    <h1>Get your machine ready to build</h1>
-    <p class="tagline">Install dev tools and apps with a single config file. Drop it in, click install, done.</p>
+    <h1>Set up your Mac so you can start building with AI in minutes.</h1>
+    <p class="tagline">A single config file installs every dependency, runtime, and app your project needs. Drop it in, click install, start building.</p>
     <a href="https://github.com/afar1/onboard-releases/releases/latest/download/onboard.computer-0.1.2-arm64.dmg" class="btn">Download for macOS</a>
     <p class="meta">
       Free and open source · <a href="https://github.com/afar1/onboard">View source</a>
@@ -245,17 +246,34 @@
         <div class="create-box">
           <p>With Claude Code, run:</p>
           <p><code>/onboard-computer</code></p>
-          <p>Scans your machine and generates a .onboard config from your current setup.</p>
+          <p>Scans your repo and generates a <code>.onboard</code> config from your project's actual dependencies.</p>
         </div>
       </div>
     </div>
   </section>
 
   <footer class="footer">
-    <a href="https://github.com/afar1/onboard">GitHub</a> · MIT License
+    <a href="https://github.com/afar1/onboard">GitHub</a> · <a href="/about.html">About</a> · MIT License
   </footer>
 
   <script>
+    // Random accent color on page load
+    const colors = [
+      '#ff6eb4', // pink
+      '#00d4aa', // teal
+      '#ffd93d', // yellow
+      '#6c5ce7', // purple
+      '#00b894', // green
+      '#fd79a8', // light pink
+      '#74b9ff', // blue
+      '#ff7675', // coral
+      '#a29bfe', // lavender
+      '#55efc4', // mint
+    ];
+    const accent = colors[Math.floor(Math.random() * colors.length)];
+    document.documentElement.style.setProperty('--accent', accent);
+
+    // ASCII animation
     const FRAME_COUNT = 78;
     const FPS = 15;
     let frames = [];

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About — onboard.computer</title>
+  <meta name="description" content="The story behind onboard.computer — a tool for setting up your Mac to build with AI.">
+  <link rel="icon" type="image/svg+xml" href="/icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #1a1a1e;
+      --bg-darker: #141418;
+      --border: #2a2a30;
+      --text: #e8e8e8;
+      --text-dim: #888;
+      --accent: #ff6eb4;
+    }
+
+    body {
+      font-family: 'JetBrains Mono', monospace;
+      background: linear-gradient(135deg, var(--bg) 0%, var(--bg-darker) 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 60px 24px;
+    }
+
+    .back {
+      display: inline-block;
+      font-size: 13px;
+      color: var(--text-dim);
+      text-decoration: none;
+      margin-bottom: 40px;
+    }
+
+    .back:hover {
+      color: var(--accent);
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 32px;
+      color: var(--accent);
+    }
+
+    .essay {
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--text);
+    }
+
+    .essay p {
+      margin-bottom: 20px;
+    }
+
+    .essay a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .essay a:hover {
+      text-decoration: underline;
+    }
+
+    .signature {
+      margin-top: 32px;
+      font-style: italic;
+      color: var(--text-dim);
+    }
+
+    .section {
+      margin-top: 48px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+    }
+
+    .section h2 {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--accent);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .made-by {
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .made-by a {
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .made-by a:hover {
+      color: var(--accent);
+    }
+
+    .contributors {
+      list-style: none;
+    }
+
+    .contributors li {
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+
+    .contributors a {
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .contributors a:hover {
+      color: var(--accent);
+    }
+
+    .contributors .handle {
+      color: var(--text-dim);
+      font-size: 12px;
+    }
+
+    .footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .footer a {
+      color: var(--text-dim);
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      color: var(--accent);
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 40px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <a href="/" class="back">&larr; Back</a>
+
+    <h1>About</h1>
+
+    <div class="essay">
+      <p>A colleague of mine, Benj, and I are on what you'd call a native AI team. We like trying the latest models, the newest tools. We see their flaws and failures, but we also know what it feels like when agentic coding finally clicks.</p>
+
+      <p>Every time we onboard someone new to the team, or try a fresh machine ourselves, we hit the same wall: hours lost to setup. Installing Homebrew, configuring Node, tracking down that one missing dependency that breaks everything. It's tedious. It kills momentum.</p>
+
+      <p>So we built this. A simple app that reads a config file and sets up your machine. Drop it in a repo, share it with your team, and anyone can go from zero to building in minutes instead of hours.</p>
+
+      <p>It's not complicated. It's not trying to be clever. It just works.</p>
+
+      <p>We're releasing it open source because we think more people should be building with AI, not fighting with their dev environment. If this saves you time, that's enough.</p>
+
+      <p class="signature">— Andrew</p>
+    </div>
+
+    <div class="section">
+      <h2>Made by</h2>
+      <p class="made-by">
+        <a href="https://density.io">Density</a> · <a href="https://routines.com">Routines</a> · <a href="https://fieldtheory.dev">Field Theory</a>
+      </p>
+    </div>
+
+    <div class="section">
+      <h2>Contributors</h2>
+      <ul class="contributors">
+        <li><a href="https://github.com/afar1">Andrew Farah</a> <span class="handle">@afar1</span></li>
+        <li><a href="https://github.com/jneb802">Benj Marston</a> <span class="handle">@jneb802</span></li>
+      </ul>
+    </div>
+
+    <footer class="footer">
+      <a href="https://github.com/afar1/onboard">GitHub</a> · <a href="/">Home</a> · MIT License
+    </footer>
+  </div>
+
+  <script>
+    // Random accent color on page load (same as main page)
+    const colors = [
+      '#ff6eb4', // pink
+      '#00d4aa', // teal
+      '#ffd93d', // yellow
+      '#6c5ce7', // purple
+      '#00b894', // green
+      '#fd79a8', // light pink
+      '#74b9ff', // blue
+      '#ff7675', // coral
+      '#a29bfe', // lavender
+      '#55efc4', // mint
+    ];
+    const accent = colors[Math.floor(Math.random() * colors.length)];
+    document.documentElement.style.setProperty('--accent', accent);
+  </script>
+
+</body>
+</html>
