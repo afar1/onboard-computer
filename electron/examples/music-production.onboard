@@ -1,0 +1,60 @@
+name: Music & Audio Production
+description: Create beats, mix tracks, make noise
+
+dependencies:
+  - id: ffmpeg
+    name: FFmpeg
+    icon: "🎬"
+    description: Audio/video conversion swiss army knife
+    check: ffmpeg -version
+    install: brew install ffmpeg
+
+  - id: fluidsynth
+    name: FluidSynth
+    icon: "🎹"
+    description: Software MIDI synthesizer
+    check: fluidsynth --version
+    install: brew install fluid-synth
+
+  - id: lilypond
+    name: LilyPond
+    icon: "🎼"
+    description: Music engraving (sheet music from text)
+    check: lilypond --version
+    install: brew install lilypond
+
+  - id: sox
+    name: SoX
+    icon: "🔊"
+    description: Command-line audio processing
+    check: sox --version
+    install: brew install sox
+
+  - id: supercollider
+    name: SuperCollider
+    icon: "📡"
+    description: Audio synthesis and algorithmic composition
+    check: test -d "/Applications/SuperCollider.app"
+    install: brew install --cask supercollider
+
+apps:
+  - id: audacity
+    name: Audacity
+    icon: "✂️"
+    description: Audio editor and recorder
+    check: test -d "/Applications/Audacity.app"
+    install: brew install --cask audacity
+
+  - id: sonic-pi
+    name: Sonic Pi
+    icon: "💎"
+    description: Code-based music creation
+    check: test -d "/Applications/Sonic Pi.app"
+    install: brew install --cask sonic-pi
+
+  - id: vcv-rack
+    name: VCV Rack
+    icon: "🔌"
+    description: Virtual modular synthesizer
+    check: test -d "/Applications/Rack.app"
+    install: brew install --cask vcv-rack

@@ -184,6 +184,42 @@
       margin-bottom: 0;
     }
 
+    .copy-btn {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      padding: 8px 14px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .copy-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .copy-btn.copied {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .install-cmd {
+      background: #0d0d0f;
+      border: 1px solid var(--border);
+      padding: 12px 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text);
+      overflow-x: auto;
+      white-space: nowrap;
+      margin-bottom: 12px;
+    }
+
     .footer {
       border-top: 1px solid var(--border);
       padding: 24px;
@@ -239,9 +275,10 @@
       <div class="configs-section">
         <h2>Create your own</h2>
         <div class="create-box">
-          <p>With Claude Code, run:</p>
-          <p><code>/onboard-computer</code></p>
-          <p>Scans your repo and generates a <code>.onboard</code> config from your project's actual dependencies.</p>
+          <p>Install the Claude Code skill:</p>
+          <div class="install-cmd" id="install-cmd">mkdir -p ~/.claude/skills/onboard-computer && curl -sL https://onboard.computer/skill.md -o ~/.claude/skills/onboard-computer/SKILL.md</div>
+          <button class="copy-btn" onclick="copyInstall()"><span id="copy-label">Copy</span></button>
+          <p style="margin-top: 12px">Then in any project, run <code>/onboard-computer</code> to generate a <code>.onboard</code> config from your repo.</p>
         </div>
       </div>
     </div>
@@ -289,6 +326,20 @@
     }
 
     loadFrames();
+
+    function copyInstall() {
+      const cmd = document.getElementById('install-cmd').textContent;
+      navigator.clipboard.writeText(cmd).then(() => {
+        const label = document.getElementById('copy-label');
+        const btn = label.closest('.copy-btn');
+        label.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          label.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
   </script>
 
 </body>
