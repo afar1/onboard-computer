@@ -49,30 +49,6 @@
         color: #626760;
         margin: 0 0 20px;
       }
-      .hosts {
-        display: inline-flex;
-        gap: 3px;
-        padding: 3px;
-        background: #eaece5;
-        border-radius: 9px;
-        margin: 12px 0 24px;
-      }
-      button {
-        font: inherit;
-        cursor: pointer;
-      }
-      .hosts button {
-        border: 0;
-        background: transparent;
-        border-radius: 6px;
-        padding: 7px 17px;
-        color: #626760;
-      }
-      .hosts button[aria-pressed="true"] {
-        background: #fffefa;
-        color: #242725;
-        box-shadow: 0 1px 3px #0001;
-      }
       .primary {
         display: block;
         background: #283e31;
@@ -82,10 +58,6 @@
         padding: 12px 20px;
         font-weight: 500;
         margin-bottom: 12px;
-      }
-      .hint {
-        font-size: 14px;
-        max-width: 440px;
       }
       .quiet {
         font-size: 13px;
@@ -125,18 +97,6 @@
         margin: 14px 0;
         resize: vertical;
       }
-      .secondary {
-        margin: 30px 0 20px;
-        font-size: 14px;
-      }
-      .secondary a + a {
-        margin-left: 18px;
-      }
-      footer {
-        margin-top: 36px;
-        font-size: 12px;
-        color: #73786e;
-      }
       @media (max-width: 600px) {
         main {
           padding: 28px 22px;
@@ -149,34 +109,23 @@
   </head>
   <body>
     <main>
-      <nav>
-        <span>onboard.computer</span
-        ><a href="https://fieldtheory.dev">Field Theory ↗</a>
-      </nav>
+      <nav><span>onboard.computer</span></nav>
       <h1>Set up your Mac.</h1>
       <p>
-        Get Field Theory and your assistant working together.<br />Keep what’s
-        ready. Set up what’s missing.
+        Paste into ChatGPT or Claude. Your assistant will guide you from
+        wherever you are.
       </p>
-      <div class="hosts" aria-label="Your assistant">
-        <button data-host="chatgpt" aria-pressed="true">ChatGPT</button
-        ><button data-host="claude" aria-pressed="false">Claude</button>
-      </div>
       <button class="primary" id="copy">Copy setup prompt</button>
-      <p class="hint">
-        Paste into <span id="host-name">ChatGPT</span> on your Mac. Your
-        assistant will guide the setup and a short test.
-      </p>
       <div id="feedback" role="status" aria-live="polite"></div>
-      <p class="quiet">
-        Local plugin preview. Official marketplace listings are not published.
-      </p>
-      <details>
-        <summary>Read the prompt</summary>
-        <textarea id="prompt" readonly aria-label="Setup prompt"></textarea>
-      </details>
       <details id="plugin">
-        <summary>Connect Field Theory (preview)</summary>
+        <summary>Need help getting started?</summary>
+        <p>
+          Start with <a href="https://chatgpt.com/download/">ChatGPT</a> or
+          <a href="https://claude.ai/download">Claude</a>. The prompt checks
+          what you have and explains any missing app, plugin, or permission.
+          Ordinary chat can guide you, but it cannot operate your Mac without a
+          supported local session and computer use.
+        </p>
         <p>
           <a
             href="https://github.com/afar1/field-releases/releases/download/v0.3.78-onboarding.1/field-theory-plugin.zip"
@@ -192,89 +141,62 @@
         <p>
           <strong>Claude Desktop:</strong> open Customize → Plugins → Add and
           upload the ZIP. Start a new conversation in <strong>Code</strong> mode
-          and choose <strong>This computer</strong>. This local setup is verified;
-          ordinary Chat does not expose the plugin’s tools. Supported local
-          Cowork sessions have not been separately tested. For the Claude Code
-          CLI, follow the included README.
+          and choose <strong>This computer</strong>. This local setup is
+          verified; ordinary Chat does not expose the plugin’s tools. Supported
+          local Cowork sessions have not been separately tested. For the Claude
+          Code CLI, follow the included README.
         </p>
         <p class="muted">
           The plugin needs a local Node runtime. Its installer reuses Codex’s
           runtime when available and explains any missing prerequisite. Enable
           your assistant’s computer-use feature separately.
         </p>
-      </details>
-      <details>
-        <summary>What gets set up?</summary>
+
         <p>
-          Field Theory, secure account sign-in, local transcription, and
-          recording access. Your assistant helps enable computer use and test a
-          short recording. Existing settings are preserved.
+          <a
+            href="https://github.com/afar1/onboard-releases/releases/download/v0.2.1-onboarding.2/onboard.computer-0.2.1-onboarding.2-arm64.dmg"
+            >Download Onboard</a
+          >
+          to handle installation. This preview is signed and notarized for Apple
+          silicon Macs.
         </p>
-        <p>Builder tools are optional, after the essentials work.</p>
-        <a href="/builder.onboard">Read Builder configuration</a> ·
-        <a
-          href="onboard://load?url=https%3A%2F%2Fonboard-assisted-setup-afar1.vercel.app%2Fbuilder.onboard"
-          >Open Builder in Onboard</a
-        >
+        <p>
+          Builder tools are optional, after recording and computer use work.
+          <a href="/builder.onboard">Read the Builder configuration</a> or
+          <a
+            href="onboard://load?url=https%3A%2F%2Fonboard-assisted-setup-afar1.vercel.app%2Fbuilder.onboard"
+            >open it in Onboard</a
+          >.
+        </p>
+        <details id="read-prompt">
+          <summary>Read the prompt</summary>
+          <textarea id="prompt" readonly aria-label="Setup prompt"></textarea>
+        </details>
+        <p class="quiet">
+          <a href="https://fieldtheory.dev">Field Theory</a> ·
+          <a href="https://github.com/afar1/onboard-computer">Source</a> ·
+          <a href="/about.html">About</a>
+        </p>
       </details>
-      <div class="secondary">
-        <a
-          id="download"
-          href="https://github.com/afar1/onboard-releases/releases/download/v0.2.1-onboarding.2/onboard.computer-0.2.1-onboarding.2-arm64.dmg"
-          >Download Onboard</a
-        ><a id="assistant" href="https://chatgpt.com/download/">Get ChatGPT</a>
-      </div>
-      <p class="quiet">
-        Onboard preview for Apple silicon Macs. Signed and notarized.
-      </p>
-      <footer>
-        <a href="https://github.com/afar1/onboard-computer">Source</a> ·
-        <a href="/about.html">About</a>
-      </footer>
     </main>
     <script src="/setup-prompt.js"></script>
     <script>
-      let host = "chatgpt";
       const prompt = document.getElementById("prompt");
-      function update() {
-        const name = host === "claude" ? "Claude" : "ChatGPT";
-        document.getElementById("host-name").textContent = name;
-        prompt.value = setupPrompt(host, undefined, location.origin);
-        document.getElementById("assistant").textContent = "Get " + name;
-        document.getElementById("assistant").href =
-          host === "claude"
-            ? "https://claude.ai/download"
-            : "https://chatgpt.com/download/";
-        document
-          .querySelectorAll("[data-host]")
-          .forEach((b) =>
-            b.setAttribute("aria-pressed", String(b.dataset.host === host)),
-          );
-        document.getElementById("feedback").textContent = "";
-      }
-      document.querySelectorAll("[data-host]").forEach(
-        (b) =>
-          (b.onclick = () => {
-            host = b.dataset.host;
-            update();
-          }),
-      );
+      prompt.value = setupPrompt(undefined, undefined, location.origin);
       document.getElementById("copy").onclick = async () => {
         try {
           await navigator.clipboard.writeText(prompt.value);
           document.getElementById("feedback").textContent =
-            "Copied. Paste into " +
-            (host === "claude" ? "Claude" : "ChatGPT") +
-            " to begin.";
+            "Copied. Paste into ChatGPT or Claude to begin.";
         } catch {
-          document.querySelector("details").open = true;
+          document.getElementById("plugin").open = true;
+          document.getElementById("read-prompt").open = true;
           prompt.focus();
           prompt.select();
           document.getElementById("feedback").textContent =
             "Select and copy the prompt below.";
         }
       };
-      update();
     </script>
   </body>
 </html>
