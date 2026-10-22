@@ -31,7 +31,18 @@
         line-height: 1.06;
         margin: 0 0 28px;
       }
-      h1 span { display: block; }
+      .steps {
+        width: fit-content;
+        margin: 0 auto 34px;
+        padding-left: 24px;
+        text-align: left;
+        line-height: 1.9;
+        color: #424245;
+      }
+      .steps li { padding-left: 4px; }
+      .steps li::marker { color: #86868b; }
+      .steps a { color: inherit; text-decoration-color: #b6b6bc; text-underline-offset: 4px; }
+      .steps a:hover { color: #0071e3; }
       p {
         color: #6e6e73;
         font-size: 21px;
@@ -83,10 +94,15 @@
   </head>
   <body>
     <main>
-      <h1><span>One prompt.</span>Your Mac, ready for agents.</h1>
+      <h1>Set up your Mac for AI.</h1>
       <p>
-        Paste into ChatGPT or Claude. Let your assistant take it from here.
+        One prompt. Guided by your assistant.
       </p>
+      <ol class="steps">
+        <li><a href="https://chatgpt.com/download/">Install ChatGPT</a></li>
+        <li>Click the Work tab</li>
+        <li>Paste this prompt</li>
+      </ol>
       <button class="primary" id="copy">Copy setup prompt</button>
       <div id="feedback" role="status" aria-live="polite"></div>
       <details id="read-prompt">
