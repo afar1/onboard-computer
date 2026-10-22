@@ -2,15 +2,14 @@ const hostSelect = document.getElementById("assistant-host");
 hostSelect.value =
   localStorage.getItem("assisted-host") === "claude" ? "claude" : "chatgpt";
 const promptArea = document.getElementById("assisted-prompt");
+const primary = document.getElementById("continue-assistant");
+const feedback = document.getElementById("assisted-feedback");
 let observedSetup = null;
+let nextAction = null;
+let actionRunning = false;
 function updatePrompt() {
   promptArea.value = setupPrompt(hostSelect.value, observedSetup);
 }
-hostSelect.addEventListener("change", () => {
-  localStorage.setItem("assisted-host", hostSelect.value);
-  updatePrompt();
-  refreshAssisted();
-});
 function setupRow(title, detail, action, callback) {
   const row = document.createElement("div");
   row.className = "assisted-row";
@@ -23,181 +22,251 @@ function setupRow(title, detail, action, callback) {
   row.append(content);
   if (action) {
     const button = document.createElement("button");
-    button.className = "btn btn-sm";
+    button.className = "assisted-link";
     button.textContent = action;
-    button.onclick = callback;
+    button.onclick = () => perform(callback);
     row.append(button);
   }
   return row;
 }
+async function perform(action) {
+  if (actionRunning) return;
+  actionRunning = true;
+  primary.disabled = true;
+  hostSelect.disabled = true;
+  feedback.textContent = "";
+  try {
+    await action();
+  } catch (error) {
+    feedback.textContent = error.message;
+  } finally {
+    actionRunning = false;
+    hostSelect.disabled = false;
+    await refreshAssisted();
+  }
+}
+async function continueInAssistant() {
+  const result = await window.onboard.assistedPrompt(hostSelect.value);
+  promptArea.value = result.prompt;
+  await window.onboard.assistedOpen(hostSelect.value);
+  feedback.textContent =
+    "Prompt copied. Paste it into your assistant and send.";
+}
 async function refreshAssisted() {
-  const button = document.getElementById("refresh-assisted");
-  button.disabled = true;
+  const refresh = document.getElementById("refresh-assisted");
+  refresh.disabled = true;
   try {
     observedSetup = await window.onboard.assistedStatus();
+    const s = observedSetup,
+      ft = s.fieldTheory,
+      host = hostSelect.value;
+    const hostName = host === "claude" ? "Claude" : "ChatGPT";
     const list = document.getElementById("assisted-status");
     list.replaceChildren();
-    const host = hostSelect.value;
-    list.append(
-      setupRow(
-        host === "claude" ? "Claude" : "ChatGPT",
-        observedSetup.apps[host]
-          ? "Installed. Sign-in and computer use still need checking in the assistant."
-          : "Not installed. Download the desktop app to continue.",
-        observedSetup.apps[host] ? "Open" : "Download",
-        () => window.onboard.assistedOpen(host),
-      ),
+    const missing = [];
+    let readyCount = 0;
+    const add = (name, detail, ready, label, action) => {
+      list.append(setupRow(name, detail, label, action));
+      if (ready) readyCount++;
+    };
+    const act = (action) => () => window.onboard.assistedAction(action);
+    add(
+      hostName,
+      s.apps[host]
+        ? "Installed. Computer use is checked in your assistant."
+        : "Not installed.",
+      s.apps[host],
+      s.apps[host] ? "Open" : "Download",
+      () => window.onboard.assistedOpen(host),
     );
-    if (!observedSetup.apps[host] && observedSetup.homebrewAvailable) {
-      list.append(
-        setupRow(
-          "Install with Homebrew",
-          "Install only your selected assistant. Builder is optional.",
-          "Install",
-          async () => {
-            const feedback = document.getElementById("assisted-feedback");
-            feedback.textContent =
-              "Installing your assistant… This can take a few minutes.";
-            try {
-              await window.onboard.assistedInstall(host);
-              feedback.textContent =
-                "Installed. Sign in and enable computer use in your assistant.";
-              await refreshAssisted();
-            } catch (error) {
-              feedback.textContent = error.message;
-            }
-          },
-        ),
+    if (!s.apps[host])
+      missing.push(
+        s.homebrewAvailable
+          ? [
+              "Install " + hostName,
+              "We’ll install your assistant using Homebrew. Your other apps stay as they are.",
+              "Install " + hostName,
+              async () => {
+                feedback.textContent =
+                  "Installing… This may take a few minutes.";
+                await window.onboard.assistedInstall(host);
+                feedback.textContent = "Installed.";
+              },
+            ]
+          : [
+              "Get " + hostName,
+              "Download the desktop app, then return here.",
+              "Download " + hostName,
+              () => window.onboard.assistedOpen(host),
+            ],
       );
-    }
-    list.append(
-      setupRow(
-        "Field Theory",
-        observedSetup.apps.fieldTheory
-          ? "Installed. Check account, model, and recording access below."
-          : "Not installed. Download and open Field Theory.",
-        observedSetup.apps.fieldTheory ? "Open" : "Download",
+    add(
+      "Field Theory",
+      s.apps.fieldTheory ? "Installed." : "Not installed.",
+      s.apps.fieldTheory,
+      "Open",
+      () => window.onboard.assistedOpen("fieldTheory"),
+    );
+    if (!s.apps.fieldTheory)
+      missing.push([
+        "Get Field Theory",
+        "Install the preview app for recording and local transcription.",
+        "Download Field Theory",
+        () => window.onboard.assistedOpen("fieldTheoryPreview"),
+      ]);
+    else if (!ft)
+      missing.push([
+        "Open Field Theory",
+        "Open the setup preview so we can check your account and recording setup.",
+        "Open Field Theory",
         () => window.onboard.assistedOpen("fieldTheory"),
-      ),
-    );
-    if (observedSetup.fieldTheory) {
-      const ft = observedSetup.fieldTheory;
-      const act = async (action) => {
-        try {
-          await window.onboard.assistedAction(action);
-          await refreshAssisted();
-        } catch (error) {
-          document.getElementById("assisted-feedback").textContent =
-            error.message;
-        }
-      };
-      list.append(
-        setupRow(
-          "Field Theory account",
-          ft.account.signedIn === true
-            ? "Signed in."
-            : ft.account.signedIn === false
-              ? "Sign in inside Field Theory. Keep verification codes out of the chat."
-              : "Not checked.",
-          "Account",
-          () => act("open-account"),
-        ),
+      ]);
+    if (!ft)
+      add("Recording setup", s.fieldTheoryError, false, "Get preview", () =>
+        window.onboard.assistedOpen("fieldTheoryPreview"),
       );
+    if (ft) {
+      add(
+        "Account",
+        ft.account.signedIn
+          ? "Signed in."
+          : "Sign in securely in Field Theory.",
+        ft.account.signedIn === true,
+        "Account",
+        act("open-account"),
+      );
+      if (!ft.account.signedIn)
+        missing.push([
+          "Connect your account",
+          "Sign in inside Field Theory. Come back here when you’re done.",
+          "Sign in to Field Theory",
+          act("open-account"),
+        ]);
       const engine = ft.parakeet.engines.find(
         (e) => e.engine === ft.parakeet.activeEngine,
       );
-      list.append(
-        setupRow(
-          "Local transcription",
+      const modelReady =
+        ft.parakeet.runtimeInstalled === true &&
+        engine?.verified === true &&
+        !engine.needsReinstall &&
+        !engine.hasError;
+      add(
+        "Local transcription",
+        modelReady
+          ? "Parakeet is verified."
+          : ft.setup.parakeetPreparing
+            ? "Preparing Parakeet…"
+            : "Parakeet needs preparation.",
+        modelReady,
+        "Settings",
+        act("open-transcription"),
+      );
+      if (!modelReady)
+        missing.push(
           ft.setup.parakeetPreparing
-            ? "Preparing Parakeet. You can return here to check progress."
-            : engine?.verified
-              ? "Parakeet model verified. A real recording still needs testing."
-              : "Parakeet needs preparation or verification.",
-          "Set up",
-          () => act("prepare-parakeet"),
-        ),
+            ? [
+                "Preparing transcription",
+                "You can continue in your assistant while Parakeet finishes.",
+                "Continue in " + hostName,
+                continueInAssistant,
+              ]
+            : [
+                "Prepare local transcription",
+                "Field Theory will download and check Parakeet on this Mac.",
+                "Set up transcription",
+                act("prepare-parakeet"),
+              ],
+        );
+      const permissionsReady =
+        ft.permissions.microphone === "granted" &&
+        ft.permissions.screen === "granted" &&
+        ft.permissions.accessibility === true;
+      add(
+        "Recording access",
+        "Microphone: " +
+          (ft.permissions.microphone || "unknown") +
+          " · Call audio: " +
+          (ft.permissions.screen || "unknown") +
+          " · Paste access: " +
+          (ft.permissions.accessibility ? "allowed" : "not confirmed"),
+        permissionsReady,
+        "Permissions",
+        act("open-permissions"),
       );
-      list.append(
-        setupRow(
-          "Recording access",
-          "Microphone: " +
-            (ft.permissions.microphone || "not checked") +
-            ". Call audio: " +
-            (ft.permissions.screen || "not checked") +
-            ". Automatic paste: " +
-            (ft.permissions.accessibility === true
-              ? "allowed"
-              : "not confirmed") +
-            ".",
-          "Permissions",
-          () => act("open-permissions"),
-        ),
+      if (!permissionsReady)
+        missing.push([
+          "Allow recording access",
+          "Field Theory will guide you through the permissions that are missing.",
+          "Review permissions",
+          act("open-permissions"),
+        ]);
+      const sources = {
+        "microphone-and-system-audio": "Your voice and the call",
+        microphone: "Your microphone",
+        "system-audio": "Sound from your call",
+      };
+      add(
+        "Recording shortcut",
+        (ft.recording.hotkey || "Not set") +
+          " · " +
+          (sources[ft.recording.source] || "Check your audio source"),
+        false,
+        "Settings",
+        act("open-transcription"),
       );
-      list.append(
-        setupRow(
-          "Recording shortcut",
-          (ft.recording.hotkey || "Check in Field Theory") +
-            " · Audio source: " +
-            (ft.recording.source || "not checked") +
-            ". Existing preferences are preserved.",
-          "Settings",
-          () => act("open-transcription"),
-        ),
-      );
-    } else
-      list.append(
-        setupRow(
-          "Recording and account",
-          observedSetup.fieldTheoryError,
-          "Get preview",
-          () => window.onboard.assistedOpen("fieldTheoryPreview"),
-        ),
-      );
-    list.append(
-      setupRow(
-        "Computer use",
-        "Not verified here. Your assistant must demonstrate a harmless click or typing action.",
-      ),
+    }
+    add(
+      "Final test",
+      "Record a short instruction, check the transcript, then try computer use with your assistant.",
+      false,
     );
+    const next = missing[0] || [
+      "Try it with your assistant",
+      "Your local setup is in place. Paste the prompt to check recording and computer use together.",
+      "Continue in " + hostName,
+      continueInAssistant,
+    ];
+    document.getElementById("next-title").textContent = next[0];
+    document.getElementById("next-description").textContent = next[1];
+    primary.textContent = next[2];
+    nextAction = next[3];
+    primary.disabled = actionRunning;
+    document.getElementById("ready-summary").textContent = readyCount
+      ? "Already set up · " + readyCount + " checks"
+      : "Setup details";
     updatePrompt();
   } catch (error) {
-    document.getElementById("assisted-feedback").textContent = error.message;
+    feedback.textContent = error.message;
+    primary.disabled = false;
+    primary.textContent = "Try again";
+    nextAction = refreshAssisted;
   } finally {
-    button.disabled = false;
+    refresh.disabled = false;
   }
 }
+hostSelect.onchange = () => {
+  localStorage.setItem("assisted-host", hostSelect.value);
+  updatePrompt();
+  refreshAssisted();
+};
+primary.onclick = () => perform(nextAction);
 document.getElementById("refresh-assisted").onclick = refreshAssisted;
-document.getElementById("continue-assistant").onclick = async () => {
-  const button = document.getElementById("continue-assistant");
-  button.disabled = true;
-  try {
-    const result = await window.onboard.assistedPrompt(hostSelect.value);
-    promptArea.value = result.prompt;
-    await window.onboard.assistedOpen(hostSelect.value);
-    document.getElementById("assisted-feedback").textContent =
-      "Prompt copied. Paste it into your assistant and send to continue.";
-  } catch (error) {
-    document.getElementById("assisted-feedback").textContent = error.message;
-  } finally {
-    button.disabled = false;
-  }
+document.getElementById("preview-help").onclick = (event) => {
+  event.preventDefault();
+  window.onboard.openExternal(
+    "https://onboard-assisted-setup-afar1.vercel.app/#plugin",
+  );
 };
 document.getElementById("open-builder").onclick = () =>
   loadConfig("bundled:builder");
 updatePrompt();
 refreshAssisted();
-// Refresh only when the user returns from permissions or sign-in, never continuously.
 window.addEventListener("focus", () => {
-  if (!document.getElementById("assisted").hidden) refreshAssisted();
+  if (!document.getElementById("assisted").hidden && !actionRunning)
+    refreshAssisted();
 });
-
 function showAssistedSetup() {
-  if (orchestrating) {
-    document.getElementById("assisted-feedback").textContent =
-      "Wait for the current installation to finish.";
-    return;
-  }
+  if (orchestrating) return;
   window.onboard.setupPollStop();
   document.getElementById("main-content").style.display = "none";
   document.getElementById("empty-state").style.display = "none";

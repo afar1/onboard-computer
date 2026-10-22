@@ -17,19 +17,18 @@
   </div>
 
   <section id="assisted" class="assisted">
-    <h1>Get ready for a support call.</h1>
-    <p>Check what already works. Set up only what is missing.</p>
-    <label for="assistant-host">Your assistant</label>
-    <select id="assistant-host"><option value="chatgpt">ChatGPT</option><option value="claude">Claude</option></select>
-    <div id="assisted-status" aria-live="polite">Checking your Mac…</div>
-    <div class="assisted-actions">
-      <button class="btn btn-primary" id="continue-assistant">Copy prompt and open assistant</button>
-      <button class="btn" id="refresh-assisted">Check again</button>
+    <h1>Let’s get you set up.</h1>
+    <p class="assisted-intro">Your Mac, ready to work with an assistant.</p>
+    <div class="assisted-host"><label for="assistant-host">Use</label>
+    <select id="assistant-host"><option value="chatgpt">ChatGPT</option><option value="claude">Claude</option></select></div>
+    <div class="assisted-next"><h2 id="next-title">Checking your Mac…</h2><p id="next-description"></p>
+      <button class="btn btn-primary" id="continue-assistant" disabled>Checking…</button>
     </div>
     <p id="assisted-feedback" role="status"></p>
-    <details><summary>Read your setup prompt</summary><textarea id="assisted-prompt" readonly aria-label="Setup prompt"></textarea></details>
-    <details><summary>Optional: tools for building</summary><p>Builder adds development tools after your recording and computer-use setup works.</p><button class="btn" id="open-builder">Review Builder setup</button></details>
-    <p class="assisted-note">The official Field Theory marketplace listings are not published yet. Use a supplied local plugin or follow the prompt with your assistant’s computer-use tools.</p>
+    <details id="ready-details"><summary id="ready-summary">Your setup</summary><div id="assisted-status"></div><button class="assisted-link" id="refresh-assisted">Check again</button></details>
+    <details><summary>Read the setup prompt</summary><textarea id="assisted-prompt" readonly aria-label="Setup prompt"></textarea></details>
+    <details><summary>Add tools for building</summary><p>Optional development tools, installed only when you choose.</p><button class="btn" id="open-builder">Review Builder</button></details>
+    <p class="assisted-note">Preview · <a href="#" id="preview-help">Plugin installation help</a></p>
   </section>
   <!-- Empty state: centered drop zone -->
   <div class="empty-state" id="empty-state">

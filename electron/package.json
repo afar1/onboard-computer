@@ -1,7 +1,7 @@
 {
   "name": "onboard-computer",
   "productName": "onboard.computer",
-  "version": "0.2.1-onboarding.1",
+  "version": "0.2.1-onboarding.2",
   "description": "Developer onboarding \u2014 get your machine ready to build.",
   "main": "main.js",
   "scripts": {
