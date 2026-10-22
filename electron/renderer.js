@@ -1694,6 +1694,7 @@ async function init() {
   } else {
     document.getElementById('empty-state').style.display = 'none';
     document.getElementById('assisted').hidden = false;
+    setStatus('Support-call setup');
   }
 }
 
