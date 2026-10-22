@@ -1,6 +1,312 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Onboard — Get your Mac ready</title><meta name="description" content="Get your Mac ready for a support call with Field Theory and your AI assistant. Install only what is missing, then optionally add Builder tools."><link rel="icon" href="/icon.svg"><style>
-*{box-sizing:border-box}body{margin:0;background:#f6f5f1;color:#242725;font:17px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}main{max-width:880px;margin:auto;padding:56px 28px}nav{display:flex;justify-content:space-between;font-size:14px;margin-bottom:85px}a{color:inherit;text-underline-offset:4px}h1{font-weight:500;font-size:clamp(38px,6vw,60px);line-height:1.08;letter-spacing:-2px;max-width:660px;margin:0 0 22px}p{max-width:640px;color:#626760}h2{font-size:23px;line-height:1.3;font-weight:500}button,.button{font:inherit;border:1px solid #c9cec5;border-radius:8px;padding:11px 18px;cursor:pointer;background:transparent;color:inherit;text-decoration:none;display:inline-block}.primary{background:#283e31;color:white;border-color:#283e31}button[aria-pressed=true]{background:#e0e7df;border-color:#536950}.hosts{display:flex;gap:8px;margin:28px 0 24px}.panel{margin:34px 0;padding:28px;border:1px solid #d9ddd4;border-radius:14px;background:#fffefa}.actions{display:flex;gap:12px;flex-wrap:wrap}.muted{font-size:14px;color:#73786e}ol{padding-left:22px}li{padding:7px 0}textarea{width:100%;min-height:300px;padding:16px;border:1px solid #ccd1c7;border-radius:8px;font:14px/1.6 ui-monospace,monospace;background:#f7f8f4;color:#30362d;margin:14px 0;resize:vertical}details{margin-top:22px}summary{cursor:pointer}footer{margin-top:60px;font-size:14px;color:#73786e}#feedback{min-height:24px} @media(max-width:600px){main{padding:28px 20px}nav{margin-bottom:55px}.panel{padding:20px}}
-</style></head><body><main><nav><span>onboard.computer</span><a href="https://fieldtheory.dev">Field Theory ↗</a></nav><h1>A Mac that’s ready<br>to work with you.</h1><p>Get Field Theory, local transcription, and your assistant working together. Start with what you need for a support call. Add tools for building when you’re ready.</p><div class="hosts" aria-label="Your assistant"><button data-host="chatgpt" aria-pressed="true">ChatGPT</button><button data-host="claude" aria-pressed="false">Claude</button></div><section class="panel"><h2>Set up with <span id="host-name">ChatGPT</span></h2><p>Copy this request into your assistant’s desktop app. It checks what’s already working and guides you through the rest.</p><div class="actions"><button class="primary" id="copy">Copy setup prompt</button><a class="button" id="assistant" href="https://chatgpt.com/download/">Get ChatGPT</a></div><div id="feedback" class="muted" role="status" aria-live="polite"></div><details><summary>Read the prompt before copying</summary><textarea id="prompt" readonly aria-label="Setup prompt"></textarea></details><p class="muted">Field Theory’s official ChatGPT and Claude marketplace listings are not published yet. This preview supports a local plugin when supplied, or guided setup with the Onboard app. Your assistant’s computer-use feature must be available on your plan.</p></section><section><h2>One conversation. A few necessary approvals.</h2><ol><li><strong>Check your Mac.</strong> Reuse apps, accounts, and permissions that already work.</li><li><strong>Prepare Field Theory.</strong> Sign in securely and set up local transcription.</li><li><strong>Allow recording and computer use.</strong> Your assistant explains each approval in Mac settings.</li><li><strong>Try it on a call.</strong> Record your helper, check the transcript, and test a simple computer action.</li></ol></section><section class="panel"><h2>Prefer an app to handle installation?</h2><p>Onboard checks your Mac and installs missing tools. Continue in your assistant for permissions and the final test.</p><a class="button" id="download" href="https://github.com/afar1/onboard-releases/releases/latest">Download Onboard for Mac</a><p class="muted" id="download-note">The public release contains the existing installer. The assisted-setup preview is not yet published as a download.</p></section><details><summary>Optional: make this Mac ready to build</summary><p>After the support-call setup works, Builder adds development tools and guides any remaining sign-ins. You can inspect its configuration first.</p><a href="/builder.onboard">Read Builder configuration</a> · <a href="onboard://load?url=https%3A%2F%2Fonboard.computer%2Fbuilder.onboard">Open Builder in Onboard</a></details><footer><a href="https://github.com/afar1/onboard">Source</a> · <a href="/about.html">About</a></footer></main><script src="/setup-prompt.js"></script><script>
-let host='chatgpt';const prompt=document.getElementById('prompt');function update(){const name=host==='claude'?'Claude':'ChatGPT';document.getElementById('host-name').textContent=name;prompt.value=setupPrompt(host);document.getElementById('assistant').textContent='Get '+name;document.getElementById('assistant').href=host==='claude'?'https://claude.ai/download':'https://chatgpt.com/download/';document.querySelectorAll('[data-host]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.host===host)));document.getElementById('feedback').textContent=''}document.querySelectorAll('[data-host]').forEach(b=>b.onclick=()=>{host=b.dataset.host;update()});document.getElementById('copy').onclick=async()=>{try{await navigator.clipboard.writeText(prompt.value);document.getElementById('feedback').textContent='Copied. Paste into '+(host==='claude'?'Claude':'ChatGPT')+' to begin.'}catch{document.querySelector('details').open=true;prompt.focus();prompt.select();document.getElementById('feedback').textContent='Select and copy the prompt below.'}};update();
-</script></body></html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Onboard — Get your Mac ready</title>
+    <meta
+      name="description"
+      content="Get your Mac ready for a support call with Field Theory and your AI assistant. Install only what is missing, then optionally add Builder tools."
+    />
+    <link rel="icon" href="/icon.svg" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #f6f5f1;
+        color: #242725;
+        font:
+          17px/1.6 -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+      }
+      main {
+        max-width: 880px;
+        margin: auto;
+        padding: 56px 28px;
+      }
+      nav {
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        margin-bottom: 85px;
+      }
+      a {
+        color: inherit;
+        text-underline-offset: 4px;
+      }
+      h1 {
+        font-weight: 500;
+        font-size: clamp(38px, 6vw, 60px);
+        line-height: 1.08;
+        letter-spacing: -2px;
+        max-width: 660px;
+        margin: 0 0 22px;
+      }
+      p {
+        max-width: 640px;
+        color: #626760;
+      }
+      h2 {
+        font-size: 23px;
+        line-height: 1.3;
+        font-weight: 500;
+      }
+      button,
+      .button {
+        font: inherit;
+        border: 1px solid #c9cec5;
+        border-radius: 8px;
+        padding: 11px 18px;
+        cursor: pointer;
+        background: transparent;
+        color: inherit;
+        text-decoration: none;
+        display: inline-block;
+      }
+      .primary {
+        background: #283e31;
+        color: white;
+        border-color: #283e31;
+      }
+      button[aria-pressed="true"] {
+        background: #e0e7df;
+        border-color: #536950;
+      }
+      .hosts {
+        display: flex;
+        gap: 8px;
+        margin: 28px 0 24px;
+      }
+      .panel {
+        margin: 34px 0;
+        padding: 28px;
+        border: 1px solid #d9ddd4;
+        border-radius: 14px;
+        background: #fffefa;
+      }
+      .actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .muted {
+        font-size: 14px;
+        color: #73786e;
+      }
+      ol {
+        padding-left: 22px;
+      }
+      li {
+        padding: 7px 0;
+      }
+      textarea {
+        width: 100%;
+        min-height: 300px;
+        padding: 16px;
+        border: 1px solid #ccd1c7;
+        border-radius: 8px;
+        font:
+          14px/1.6 ui-monospace,
+          monospace;
+        background: #f7f8f4;
+        color: #30362d;
+        margin: 14px 0;
+        resize: vertical;
+      }
+      details {
+        margin-top: 22px;
+      }
+      summary {
+        cursor: pointer;
+      }
+      footer {
+        margin-top: 60px;
+        font-size: 14px;
+        color: #73786e;
+      }
+      #feedback {
+        min-height: 24px;
+      }
+      @media (max-width: 600px) {
+        main {
+          padding: 28px 20px;
+        }
+        nav {
+          margin-bottom: 55px;
+        }
+        .panel {
+          padding: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <nav>
+        <span>onboard.computer</span
+        ><a href="https://fieldtheory.dev">Field Theory ↗</a>
+      </nav>
+      <h1>A Mac that’s ready<br />to work with you.</h1>
+      <p>
+        Get Field Theory, local transcription, and your assistant working
+        together. Start with what you need for a support call. Add tools for
+        building when you’re ready.
+      </p>
+      <div class="hosts" aria-label="Your assistant">
+        <button data-host="chatgpt" aria-pressed="true">ChatGPT</button
+        ><button data-host="claude" aria-pressed="false">Claude</button>
+      </div>
+      <section class="panel">
+        <h2>Set up with <span id="host-name">ChatGPT</span></h2>
+        <p>
+          Copy this request into your assistant’s desktop app. It checks what’s
+          already working and guides you through the rest.
+        </p>
+        <div class="actions">
+          <button class="primary" id="copy">Copy setup prompt</button
+          ><a class="button" id="assistant" href="https://chatgpt.com/download/"
+            >Get ChatGPT</a
+          >
+        </div>
+        <div id="feedback" class="muted" role="status" aria-live="polite"></div>
+        <details>
+          <summary>Read the prompt before copying</summary>
+          <textarea id="prompt" readonly aria-label="Setup prompt"></textarea>
+        </details>
+        <p class="muted">
+          Field Theory’s official ChatGPT and Claude marketplace listings are
+          not published yet. Use the local plugin preview below, or guided setup
+          with the Onboard app. Your assistant’s computer-use feature must be
+          available on your plan.
+        </p>
+      </section>
+      <details>
+        <summary>Install the local plugin preview</summary>
+        <p>
+          <a
+            href="https://github.com/afar1/field-releases/releases/download/v0.3.78-onboarding.1/field-theory-plugin.zip"
+            >Download Field Theory plugin ZIP</a
+          >. This is a local preview, not an official marketplace listing.
+        </p>
+        <p>
+          <strong>ChatGPT / Codex:</strong> unzip the download, run its included
+          <code>install.sh</code> in Terminal, then restart Codex or start a new
+          chat. The installer preserves your other plugins. This does not
+          install into ordinary ChatGPT chat.
+        </p>
+        <p>
+          <strong>Claude:</strong> in local Cowork, open Customize → Plugins →
+          Add and upload the ZIP. For Claude Code, follow the included README.
+          Cowork packaging is prepared; its runtime still needs verification.
+        </p>
+        <p class="muted">
+          The plugin needs a local Node runtime. Its installer reuses Codex’s
+          runtime when available and explains any missing prerequisite. Enable
+          your assistant’s computer-use feature separately.
+        </p>
+      </details>
+      <section>
+        <h2>One conversation. A few necessary approvals.</h2>
+        <ol>
+          <li>
+            <strong>Check your Mac.</strong> Reuse apps, accounts, and
+            permissions that already work.
+          </li>
+          <li>
+            <strong>Prepare Field Theory.</strong> Sign in securely and set up
+            local transcription.
+          </li>
+          <li>
+            <strong>Allow recording and computer use.</strong> Your assistant
+            explains each approval in Mac settings.
+          </li>
+          <li>
+            <strong>Try it on a call.</strong> Record your helper, check the
+            transcript, and test a simple computer action.
+          </li>
+        </ol>
+      </section>
+      <section class="panel">
+        <h2>Prefer an app to handle installation?</h2>
+        <p>
+          Onboard checks your Mac and installs missing tools. Continue in your
+          assistant for permissions and the final test.
+        </p>
+        <a
+          class="button"
+          id="download"
+          href="https://github.com/afar1/onboard-releases/releases/download/v0.2.1-onboarding.1/onboard.computer-0.2.1-onboarding.1-arm64.dmg"
+          >Download Onboard for Mac</a
+        >
+        <p class="muted" id="download-note">
+          Assisted-setup preview for Apple silicon Macs. Signed and notarized.
+        </p>
+      </section>
+      <details>
+        <summary>Optional: make this Mac ready to build</summary>
+        <p>
+          After the support-call setup works, Builder adds development tools and
+          guides any remaining sign-ins. You can inspect its configuration
+          first.
+        </p>
+        <a href="/builder.onboard">Read Builder configuration</a> ·
+        <a
+          href="onboard://load?url=https%3A%2F%2Fonboard-assisted-setup-afar1.vercel.app%2Fbuilder.onboard"
+          >Open Builder in Onboard</a
+        >
+      </details>
+      <footer>
+        <a href="https://github.com/afar1/onboard">Source</a> ·
+        <a href="/about.html">About</a>
+      </footer>
+    </main>
+    <script src="/setup-prompt.js"></script>
+    <script>
+      let host = "chatgpt";
+      const prompt = document.getElementById("prompt");
+      function update() {
+        const name = host === "claude" ? "Claude" : "ChatGPT";
+        document.getElementById("host-name").textContent = name;
+        prompt.value = setupPrompt(host, undefined, location.origin);
+        document.getElementById("assistant").textContent = "Get " + name;
+        document.getElementById("assistant").href =
+          host === "claude"
+            ? "https://claude.ai/download"
+            : "https://chatgpt.com/download/";
+        document
+          .querySelectorAll("[data-host]")
+          .forEach((b) =>
+            b.setAttribute("aria-pressed", String(b.dataset.host === host)),
+          );
+        document.getElementById("feedback").textContent = "";
+      }
+      document.querySelectorAll("[data-host]").forEach(
+        (b) =>
+          (b.onclick = () => {
+            host = b.dataset.host;
+            update();
+          }),
+      );
+      document.getElementById("copy").onclick = async () => {
+        try {
+          await navigator.clipboard.writeText(prompt.value);
+          document.getElementById("feedback").textContent =
+            "Copied. Paste into " +
+            (host === "claude" ? "Claude" : "ChatGPT") +
+            " to begin.";
+        } catch {
+          document.querySelector("details").open = true;
+          prompt.focus();
+          prompt.select();
+          document.getElementById("feedback").textContent =
+            "Select and copy the prompt below.";
+        }
+      };
+      update();
+    </script>
+  </body>
+</html>

@@ -12,7 +12,8 @@ const { autoUpdater } = require('electron-updater');
 const config = require('./config');
 const brew = require('./brew');
 const orchestrator = require('./orchestrator');
-require('./assisted-setup').register({ ipcMain, shell, clipboard });
+const assistedSetup = require('./assisted-setup');
+assistedSetup.register({ ipcMain, shell, clipboard, isInstallerBusy: () => orchestrateRunning || activeProcesses.size > 0 });
 
 // Configure auto-updater
 autoUpdater.autoDownload = false;
@@ -464,6 +465,7 @@ ipcMain.handle('items:check', async (_event, id) => {
 });
 
 ipcMain.handle('items:install', async (_event, id) => {
+  if (assistedSetup.isInstalling()) return { error: 'An assistant installation is running. Wait for it to finish.' };
   const item = getItem(id);
   if (!item || !item.install) return { succeeded: false, stderr: 'No install command for this item' };
   const res = await runStreamingItem(id, item.install);
@@ -621,7 +623,7 @@ ipcMain.handle('orchestrate:getPlan', async () => {
 
 ipcMain.handle('orchestrate:run', async () => {
   if (!activeConfig) return { error: 'No config loaded' };
-  if (orchestrateRunning) return { error: 'Setup is already running' };
+  if (orchestrateRunning || assistedSetup.isInstalling()) return { error: 'An installation is already running. Wait for it to finish.' };
   orchestrateRunning = true;
   orchestrateCancelled = false;
   try {
