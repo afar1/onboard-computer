@@ -205,3 +205,22 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+## Assisted setup preview
+
+The app opens with support-call essentials: choose ChatGPT or Claude, inspect
+installed applications, and continue with a state-aware prompt. Builder remains
+available as an optional configuration. Existing user-selected configurations
+continue to reopen normally.
+
+The Field Theory preview app owns account, permissions, recording preferences,
+and Parakeet readiness. Onboard reads its authenticated loopback setup API using
+`~/.fieldtheory/browser-helper.json`; connection credentials never enter the
+renderer or copied prompt. Old app versions and unavailable helpers remain
+unknown. A real call recording and host computer-use test are still required.
+
+`shared/setup-prompt.js` is the canonical prompt. Its browser and Electron copies
+are `website/setup-prompt.js` and `electron/setup-prompt.js`; update all three
+together. Official marketplace listings are not published; the site states this
+and offers native setup as the fallback. Preview app versions do not check the
+production auto-update feed.

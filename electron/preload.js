@@ -79,6 +79,11 @@ contextBridge.exposeInMainWorld('updaterAPI', {
 });
 
 contextBridge.exposeInMainWorld('onboard', {
+  assistedInstall: (host) => ipcRenderer.invoke('assisted:install', host),
+  assistedStatus: () => ipcRenderer.invoke('assisted:status'),
+  assistedPrompt: (host) => ipcRenderer.invoke('assisted:prompt', host),
+  assistedOpen: (target) => ipcRenderer.invoke('assisted:open', target),
+  assistedAction: (action) => ipcRenderer.invoke('assisted:action', action),
   // ─── Config loading ──────────────────────────────────────────────
   loadConfigFile: (filePath) => ipcRenderer.invoke('config:loadFile', filePath),
   loadConfigURL: (url) => ipcRenderer.invoke('config:loadURL', url),

@@ -201,6 +201,7 @@ function updateConfigDisplay() {
     pathEl.textContent = formatPath(lastPath);
   }
 
+  document.getElementById('assisted').hidden = true;
   // Show main content, hide empty state
   document.getElementById('empty-state').style.display = 'none';
   document.getElementById('main-content').style.display = 'block';
@@ -1691,7 +1692,8 @@ async function init() {
     const success = await loadConfig(lastConfig);
     if (!success) showEmptyState();
   } else {
-    showEmptyState();
+    document.getElementById('empty-state').style.display = 'none';
+    document.getElementById('assisted').hidden = false;
   }
 }
 

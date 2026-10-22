@@ -1,8 +1,8 @@
 {
   "name": "onboard-computer",
   "productName": "onboard.computer",
-  "version": "0.2.0",
-  "description": "Developer onboarding — get your machine ready to build.",
+  "version": "0.2.1-onboarding.1",
+  "description": "Developer onboarding \u2014 get your machine ready to build.",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -30,7 +30,9 @@
     "protocols": [
       {
         "name": "Onboard Deep Link",
-        "schemes": ["onboard"]
+        "schemes": [
+          "onboard"
+        ]
       }
     ],
     "publish": {

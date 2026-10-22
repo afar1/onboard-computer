@@ -1773,3 +1773,18 @@ html, body {
 .tool-card.orch-failed .orch-note {
   color: var(--red);
 }
+
+.assisted { padding: 65px 28px 90px; overflow-y:auto; height:100%; }
+.assisted[hidden] { display:none; }
+.assisted h1 { font-size:28px; line-height:1.2; margin-bottom:14px; }
+.assisted > p { color:var(--text-secondary,#87929d); line-height:1.6; }
+.assisted label { margin-right:10px; }
+.assisted select { padding:8px; margin:20px 0; border-radius:6px; }
+.assisted-row { display:flex; align-items:center; justify-content:space-between; gap:18px; border-top:1px solid #6b728033; padding:18px 0; }
+.assisted-row p { font-size:13px; line-height:1.5; margin:5px 0 0; color:var(--text-secondary,#87929d); }
+.assisted-actions { display:flex; flex-wrap:wrap; gap:8px; margin:20px 0; }
+.assisted details { margin:22px 0; line-height:1.6; }
+.assisted summary { cursor:pointer; }
+.assisted textarea { width:100%; height:260px; margin-top:12px; padding:12px; font:12px/1.6 monospace; }
+.assisted-note { font-size:12px; }
+.setup-detail { white-space:pre-wrap; overflow-wrap:anywhere; font-size:12px; }

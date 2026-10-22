@@ -3,7 +3,7 @@
 // The renderer addresses items by id over IPC; raw command strings never
 // cross the bridge in either direction.
 
-const { app, BrowserWindow, ipcMain, shell, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, dialog, clipboard } = require('electron');
 const path = require('path');
 const { exec, spawn, execFile } = require('child_process');
 const fs = require('fs');
@@ -12,10 +12,11 @@ const { autoUpdater } = require('electron-updater');
 const config = require('./config');
 const brew = require('./brew');
 const orchestrator = require('./orchestrator');
+require('./assisted-setup').register({ ipcMain, shell, clipboard });
 
 // Configure auto-updater
 autoUpdater.autoDownload = false;
-autoUpdater.allowPrerelease = true;
+autoUpdater.allowPrerelease = false;
 autoUpdater.setFeedURL({ provider: 'github', owner: 'afar1', repo: 'onboard-releases' });
 
 // Track pending update state
@@ -772,7 +773,7 @@ autoUpdater.on('update-downloaded', (info) => {
 ipcMain.handle('updater:getVersion', () => app.getVersion());
 ipcMain.handle('updater:getStatus', () => pendingUpdateInfo);
 ipcMain.handle('updater:checkForUpdates', () => {
-  if (app.isPackaged) {
+  if (app.isPackaged && !app.getVersion().includes('-')) {
     autoUpdater.checkForUpdates();
   } else {
     broadcastToAllWindows('updater:updateNotAvailable');
@@ -783,7 +784,7 @@ ipcMain.handle('updater:installUpdate', () => autoUpdater.quitAndInstall());
 ipcMain.handle('updater:dismissUpdate', () => { pendingUpdateInfo = null; });
 
 app.whenReady().then(() => {
-  if (app.isPackaged) {
+  if (app.isPackaged && !app.getVersion().includes('-')) {
     setTimeout(() => autoUpdater.checkForUpdates(), 5000);
     setInterval(() => autoUpdater.checkForUpdates(), 30 * 60 * 1000);
   }
