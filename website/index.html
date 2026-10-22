@@ -10,131 +10,108 @@
     />
     <link rel="icon" href="/icon.svg" />
     <style>
-      * {
-        box-sizing: border-box;
-      }
+      * { box-sizing: border-box; }
       body {
         margin: 0;
-        background: #f6f5f1;
-        color: #242725;
-        font:
-          16px/1.6 -apple-system,
-          BlinkMacSystemFont,
-          "Segoe UI",
-          sans-serif;
+        background: #fafafa;
+        color: #1d1d1f;
+        font: 17px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        -webkit-font-smoothing: antialiased;
       }
       main {
-        max-width: 640px;
+        width: min(100%, 960px);
         margin: auto;
-        padding: 40px 24px 56px;
-      }
-      nav {
-        display: flex;
-        justify-content: space-between;
-        font-size: 13px;
-        margin-bottom: 70px;
-      }
-      a {
-        color: inherit;
-        text-underline-offset: 4px;
+        padding: clamp(112px, 19vh, 200px) 28px 80px;
+        text-align: center;
       }
       h1 {
-        font-size: clamp(36px, 6vw, 48px);
-        font-weight: 500;
-        letter-spacing: -1.7px;
-        line-height: 1.12;
-        margin: 0 0 18px;
+        font-size: clamp(44px, 6.8vw, 76px);
+        font-weight: 600;
+        letter-spacing: -.055em;
+        line-height: 1.06;
+        margin: 0 0 28px;
       }
+      h1 span { display: block; }
       p {
-        color: #626760;
-        margin: 0 0 20px;
+        color: #6e6e73;
+        font-size: 21px;
+        line-height: 1.45;
+        max-width: 520px;
+        margin: 0 auto 34px;
+        text-wrap: balance;
       }
       .primary {
-        display: block;
-        background: #283e31;
-        color: white;
-        border: 0;
-        border-radius: 8px;
-        padding: 12px 20px;
+        font: inherit;
         font-weight: 500;
-        margin-bottom: 12px;
-      }
-      .quiet {
-        font-size: 13px;
-        color: #73786e;
-      }
-      #feedback:empty {
-        display: none;
-      }
-      #feedback {
-        font-size: 14px;
-        color: #365940;
-        margin: 14px 0;
-      }
-      details {
-        padding: 17px 0;
-        border-bottom: 1px solid #dce0d6;
-      }
-      summary {
+        background: #0071e3;
+        color: #fff;
+        border: 0;
+        border-radius: 999px;
+        padding: 14px 26px;
         cursor: pointer;
-        color: #51584e;
       }
-      details p {
-        font-size: 14px;
-        margin: 16px 0;
-      }
-      textarea {
+      .primary:hover { background: #0077ed; }
+      :focus-visible { outline: 3px solid #0071e3; outline-offset: 5px; }
+      #feedback:empty { display: none; }
+      #feedback { font-size: 14px; color: #6e6e73; margin: 20px 0 0; }
+      details { max-width: 680px; margin: 25px auto 0; }
+      summary { display: inline-block; cursor: pointer; color: #6e6e73; font-size: 14px; list-style: none; }
+      summary::-webkit-details-marker { display: none; }
+      summary::after { content: "+"; display: inline-block; margin-left: 8px; }
+      details[open] summary::after { content: "−"; }
+      .prompt {
+        display: block;
         width: 100%;
-        min-height: 300px;
-        padding: 14px;
-        border: 1px solid #ccd1c7;
-        border-radius: 8px;
-        font:
-          13px/1.6 ui-monospace,
-          monospace;
-        background: #fffefa;
-        color: #30362d;
-        margin: 14px 0;
-        resize: vertical;
+        padding: 24px;
+        border: 1px solid #d2d2d7;
+        border-radius: 16px;
+        font: 14px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #fff;
+        color: #424245;
+        margin: 24px 0 0;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        text-align: left;
       }
       @media (max-width: 600px) {
-        main {
-          padding: 28px 22px;
-        }
-        nav {
-          margin-bottom: 55px;
-        }
+        main { padding: 112px 24px 56px; }
+        h1 { font-size: clamp(40px, 9vw, 54px); letter-spacing: -.05em; margin-bottom: 24px; }
+        p { font-size: 19px; max-width: 320px; margin-bottom: 30px; }
+        .prompt { padding: 20px; }
       }
     </style>
   </head>
   <body>
     <main>
-      <nav><span>onboard.computer</span></nav>
-      <h1>Set up your Mac.</h1>
+      <h1><span>One prompt.</span>Your Mac, ready for agents.</h1>
       <p>
-        Paste into ChatGPT or Claude. Your assistant will guide you from
-        wherever you are.
+        Paste into ChatGPT or Claude. Let your assistant take it from here.
       </p>
       <button class="primary" id="copy">Copy setup prompt</button>
       <div id="feedback" role="status" aria-live="polite"></div>
       <details id="read-prompt">
         <summary>Show prompt</summary>
-        <textarea id="prompt" readonly aria-label="Setup prompt"></textarea>
+        <div class="prompt" id="prompt" tabindex="0" role="region" aria-label="Setup prompt"></div>
       </details>
     </main>
     <script src="/setup-prompt.js"></script>
     <script>
       const prompt = document.getElementById("prompt");
-      prompt.value = setupPrompt(undefined, undefined, location.origin);
+      const promptText = setupPrompt(undefined, undefined, location.origin);
+      prompt.textContent = promptText;
       document.getElementById("copy").onclick = async () => {
         try {
-          await navigator.clipboard.writeText(prompt.value);
+          await navigator.clipboard.writeText(promptText);
           document.getElementById("feedback").textContent =
             "Copied. Paste into ChatGPT or Claude to begin.";
         } catch {
           document.getElementById("read-prompt").open = true;
           prompt.focus();
-          prompt.select();
+          const range = document.createRange();
+          range.selectNodeContents(prompt);
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(range);
           document.getElementById("feedback").textContent =
             "Select and copy the prompt below.";
         }
