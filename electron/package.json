@@ -1,12 +1,13 @@
 {
   "name": "onboard-computer",
   "productName": "onboard.computer",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "Developer onboarding — get your machine ready to build.",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "dev": "electron . --dev",
+    "test": "node --test",
     "build": "electron-builder --mac",
     "build:dmg": "electron-builder --mac dmg",
     "package": "electron-builder --mac --publish never"
@@ -26,6 +27,12 @@
     "appId": "computer.onboard.app",
     "productName": "onboard.computer",
     "afterSign": "scripts/notarize.js",
+    "protocols": [
+      {
+        "name": "Onboard Deep Link",
+        "schemes": ["onboard"]
+      }
+    ],
     "publish": {
       "provider": "github",
       "owner": "afar1",
@@ -56,7 +63,8 @@
     ],
     "files": [
       "**/*",
-      "!examples/**"
+      "!examples/**",
+      "!*.test.js"
     ],
     "extraResources": [
       {

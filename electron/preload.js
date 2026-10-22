@@ -1,31 +1,37 @@
 // preload.js — Secure bridge between Electron main process and the renderer.
-// Exposes a clean API on window.onboard without giving the renderer
-// direct access to Node.js or Electron internals.
+// The renderer addresses config items by id; no shell command strings cross
+// this boundary in either direction.
 
 const { contextBridge, ipcRenderer, webUtils } = require('electron');
 
-// Track the current stream listener so we can swap it out
-// between streaming commands (prevents listener accumulation).
-let currentStreamCallback = null;
+// ─── Event routing (one listener per channel, swappable callbacks) ──
 
-function streamRouter(_event, data) {
-  if (currentStreamCallback) currentStreamCallback(data);
-}
+const callbacks = {
+  streamOutput: null,
+  itemStatus: null,
+  orchestrateProgress: null,
+  deviceCode: null,
+  fileOpened: null,
+  terminalWindowClosed: null,
+};
 
-// Register exactly one listener on the channel. The callback
-// is swapped via setStreamCallback below.
-ipcRenderer.on('shell:streamOutput', streamRouter);
-
-// Track file open callback (for double-click on .onboard files)
-let fileOpenedCallback = null;
-ipcRenderer.on('config:fileOpened', (_event, filePath) => {
-  if (fileOpenedCallback) fileOpenedCallback(filePath);
+ipcRenderer.on('shell:streamOutput', (_event, payload) => {
+  if (callbacks.streamOutput) callbacks.streamOutput(payload);
 });
-
-// Track terminal window close callbacks
-let terminalWindowClosedCallback = null;
+ipcRenderer.on('item:status', (_event, payload) => {
+  if (callbacks.itemStatus) callbacks.itemStatus(payload);
+});
+ipcRenderer.on('orchestrate:progress', (_event, payload) => {
+  if (callbacks.orchestrateProgress) callbacks.orchestrateProgress(payload);
+});
+ipcRenderer.on('setup:deviceCode', (_event, payload) => {
+  if (callbacks.deviceCode) callbacks.deviceCode(payload);
+});
+ipcRenderer.on('config:fileOpened', (_event, filePath) => {
+  if (callbacks.fileOpened) callbacks.fileOpened(filePath);
+});
 ipcRenderer.on('terminal:windowClosed', (_event, id) => {
-  if (terminalWindowClosedCallback) terminalWindowClosedCallback(id);
+  if (callbacks.terminalWindowClosed) callbacks.terminalWindowClosed(id);
 });
 
 // ─── Updater Event Callbacks ────────────────────────────────────────
@@ -73,66 +79,49 @@ contextBridge.exposeInMainWorld('updaterAPI', {
 });
 
 contextBridge.exposeInMainWorld('onboard', {
-  // Run a shell command and get back { stdout, stderr, exitCode, succeeded }.
-  run: (command) => ipcRenderer.invoke('shell:run', command),
+  // ─── Config loading ──────────────────────────────────────────────
+  loadConfigFile: (filePath) => ipcRenderer.invoke('config:loadFile', filePath),
+  loadConfigURL: (url) => ipcRenderer.invoke('config:loadURL', url),
+  loadBundledConfig: (name) => ipcRenderer.invoke('config:loadBundled', name),
+  openFileDialog: () => ipcRenderer.invoke('dialog:openFile'),
+  getFilePath: (file) => webUtils.getPathForFile(file),
+  homedir: () => ipcRenderer.invoke('fs:homedir'),
+  onFileOpened: (cb) => { callbacks.fileOpened = cb; },
 
-  // Open a URL in the default browser.
+  // ─── Items (resolved by id in the main process) ──────────────────
+  checkAll: () => ipcRenderer.invoke('items:checkAll'),
+  checkItem: (id) => ipcRenderer.invoke('items:check', id),
+  installItem: (id) => ipcRenderer.invoke('items:install', id),
+  uninstallItem: (id) => ipcRenderer.invoke('items:uninstall', id),
+  upgradeItem: (id) => ipcRenderer.invoke('items:upgrade', id),
+  cancelItem: (id) => ipcRenderer.invoke('items:cancel', id),
+  openItemApp: (id) => ipcRenderer.invoke('items:openApp', id),
+  revealItem: (id) => ipcRenderer.invoke('items:reveal', id),
+
+  // ─── Setup steps ─────────────────────────────────────────────────
+  runSetupAction: (id) => ipcRenderer.invoke('setup:action', id),
+  submitSetupInput: (id, values) => ipcRenderer.invoke('setup:input', id, values),
+  openSetupUrl: (id) => ipcRenderer.invoke('setup:openUrl', id),
+  runInTerminal: (id) => ipcRenderer.invoke('setup:terminal', id),
+  setupPollStart: () => ipcRenderer.invoke('setup:pollStart'),
+  setupPollStop: () => ipcRenderer.invoke('setup:pollStop'),
+
+  // ─── Orchestration ("Set up my Mac") ─────────────────────────────
+  getPlan: () => ipcRenderer.invoke('orchestrate:getPlan'),
+  runAll: () => ipcRenderer.invoke('orchestrate:run'),
+  cancelAll: () => ipcRenderer.invoke('orchestrate:cancel'),
+
+  // ─── Events ──────────────────────────────────────────────────────
+  onStreamOutput: (cb) => { callbacks.streamOutput = cb; },
+  onItemStatus: (cb) => { callbacks.itemStatus = cb; },
+  onOrchestrateProgress: (cb) => { callbacks.orchestrateProgress = cb; },
+  onDeviceCode: (cb) => { callbacks.deviceCode = cb; },
+
+  // ─── Misc ────────────────────────────────────────────────────────
   openExternal: (url) => ipcRenderer.invoke('shell:openExternal', url),
 
-  // Get the user's home directory.
-  homedir: () => ipcRenderer.invoke('fs:homedir'),
-
-  // Run a command with streaming output (for long installs).
-  runStreaming: (command) => ipcRenderer.invoke('shell:runStreaming', command),
-
-  // Run a command with streaming output and process ID for cancellation.
-  runStreamingWithId: (command, id) => ipcRenderer.invoke('shell:runStreamingWithId', command, id),
-
-  // Cancel a running process by ID.
-  cancelProcess: (id) => ipcRenderer.invoke('shell:cancelProcess', id),
-
-  // Open a path (app, file, or folder) with the default handler.
-  openPath: (path) => ipcRenderer.invoke('shell:openPath', path),
-
-  // Reveal a file/folder in Finder.
-  showInFolder: (path) => ipcRenderer.invoke('shell:showInFolder', path),
-
-  // Set the callback that receives streaming output chunks.
-  setStreamCallback: (callback) => {
-    currentStreamCallback = callback;
-  },
-
-  // Clear the stream callback (call after streaming is done).
-  clearStreamCallback: () => {
-    currentStreamCallback = null;
-  },
-
-  // ─── Config Loading ────────────────────────────────────────────────
-
-  // Load config from a local file path.
-  loadConfigFile: (filePath) => ipcRenderer.invoke('config:loadFile', filePath),
-
-  // Load config from a URL.
-  loadConfigURL: (url) => ipcRenderer.invoke('config:loadURL', url),
-
-  // Load a bundled config by name (defaults to 'default').
-  loadBundledConfig: (name) => ipcRenderer.invoke('config:loadBundled', name),
-
-  // Set callback for when a .onboard file is opened (double-click).
-  onFileOpened: (callback) => {
-    fileOpenedCallback = callback;
-  },
-
-  // Get the file path from a dropped file (needed with contextIsolation)
-  getFilePath: (file) => webUtils.getPathForFile(file),
-
-  // Open a file dialog to select a .onboard file.
-  openFileDialog: () => ipcRenderer.invoke('dialog:openFile'),
-
-  // Terminal window functions
+  // Terminal pop-out windows
   openTerminalWindow: (id, name, existingOutput) => ipcRenderer.invoke('terminal:openWindow', id, name, existingOutput),
   sendToTerminalWindow: (id, data, stream) => ipcRenderer.invoke('terminal:sendOutput', id, data, stream),
-  onTerminalWindowClosed: (callback) => {
-    terminalWindowClosedCallback = callback;
-  },
+  onTerminalWindowClosed: (cb) => { callbacks.terminalWindowClosed = cb; },
 });

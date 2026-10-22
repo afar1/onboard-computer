@@ -22,6 +22,24 @@
           "value": "attachment; filename=\"onboard-computer.dmg\""
         }
       ]
+    },
+    {
+      "source": "/install",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/plain; charset=utf-8"
+        }
+      ]
+    },
+    {
+      "source": "/(.*).onboard",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/plain; charset=utf-8"
+        }
+      ]
     }
   ]
 }

@@ -1,85 +1,26 @@
-schema_version: 1
+schema_version: 2
 name: "Data Science"
 description: "Python-focused setup for data analysis and machine learning"
 
-dependencies:
-  - id: xcode-cli
-    name: Xcode CLI Tools
-    icon_img: https://developer.apple.com/assets/elements/icons/xcode/xcode-96x96.png
-    icon_bg: "#1c7ed6"
-    desc: Apple's command line developer tools.
-    check: xcode-select -p
-    install: xcode-select --install
-
-  - id: homebrew
-    name: Homebrew
-    icon_img: homebrew.svg
-    icon_bg: "#fbb040"
-    desc: The package manager for macOS.
-    check: which brew
-    install: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
-    depends_on: xcode-cli
-
-  - id: gh
-    name: GitHub CLI
-    icon_img: github.png
-    icon_bg: "#24292e"
-    desc: Manage repos from terminal.
-    check: which gh
-    install: brew install gh
-    depends_on: homebrew
-
-  - id: git
-    name: Git
-    icon_img: git.png
-    icon_bg: "#f0f0f0"
-    desc: Version control for code and notebooks.
-    check: which git
-    install: brew install git
-    depends_on: homebrew
-
-  - id: pipx
-    name: pipx
-    icon_img: python.svg
-    icon_bg: "#3775A9"
+brew:
+  - git
+  - gh
+  - python
+  - pkg: pipx
     desc: Install Python CLI tools in isolated environments.
-    check: which pipx
     install: brew install pipx && pipx ensurepath
-    depends_on: homebrew
 
-  - id: python
-    name: Python 3
-    icon_img: python.svg
-    icon_bg: "#306998"
-    desc: The language of data science.
-    check: which python3
-    install: brew install python
-    depends_on: homebrew
-
-apps:
-  - id: cursor
-    name: Cursor
-    icon_img: Cursor.png
-    icon_bg: "#1a1a2e"
-    desc: AI-powered code editor for notebooks and scripts.
-    check: ls /Applications/Cursor.app
-    install: brew install --cask cursor
-    depends_on: homebrew
-
-  - id: docker
+cask:
+  - cursor
+  - pkg: docker
     name: Docker Desktop
     icon_img: https://www.docker.com/wp-content/uploads/2022/03/Moby-logo.png
     icon_bg: "#2496ED"
     desc: Run containers for reproducible environments.
-    check: ls /Applications/Docker.app
-    install: brew install --cask docker
-    depends_on: homebrew
-
-  - id: postico
+    check: ls /Applications/Docker.app || brew list --cask --versions docker >/dev/null 2>&1
+  - pkg: postico
     name: Postico
     icon_img: https://eggerapps.at/postico2/images/icon-rounded-256.png
     icon_bg: "#336791"
     desc: PostgreSQL client for exploring databases.
-    check: ls /Applications/Postico\ 2.app || ls /Applications/Postico.app
-    install: brew install --cask postico
-    depends_on: homebrew
+    check: ls /Applications/Postico\ 2.app || ls /Applications/Postico.app || brew list --cask --versions postico >/dev/null 2>&1

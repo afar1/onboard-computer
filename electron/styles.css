@@ -1461,3 +1461,315 @@ html, body {
   border-color: var(--blue);
   color: #fff;
 }
+
+/* ─── Setup Hero ("Set up my Mac") ───────────────────────────────── */
+
+.setup-hero {
+  margin-bottom: 24px;
+}
+
+.setup-hero-text {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.btn-hero {
+  padding: 10px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+}
+
+.ready-line {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* ─── Phase Banner ───────────────────────────────────────────────── */
+
+.phase-banner {
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: var(--blue-dim);
+  border: 1px solid var(--blue);
+  border-radius: var(--radius-sm);
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* ─── Summary Panel ──────────────────────────────────────────────── */
+
+.summary-panel {
+  margin-top: 12px;
+  padding: 14px 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.summary-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.summary-line {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.summary-line.summary-ok {
+  color: var(--green);
+}
+
+.summary-line.summary-fail {
+  color: var(--red);
+}
+
+.summary-remaining {
+  list-style: none;
+  margin: 4px 0 8px 0;
+  padding: 0;
+}
+
+.summary-remaining li {
+  font-size: 12px;
+  color: var(--text-primary);
+  padding: 2px 0 2px 14px;
+  position: relative;
+}
+
+.summary-remaining li::before {
+  content: '·';
+  position: absolute;
+  left: 2px;
+  color: var(--text-muted);
+}
+
+.summary-log-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 8px 0 10px 0;
+}
+
+/* ─── Plan Modal ─────────────────────────────────────────────────── */
+
+.modal.modal-wide {
+  width: 440px;
+}
+
+.plan-summary {
+  font-size: 13px;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.plan-group {
+  margin-bottom: 14px;
+}
+
+.plan-group h4 {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.plan-admin-note {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 500;
+  color: var(--yellow);
+  font-size: 11px;
+  margin-left: 6px;
+}
+
+.plan-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.plan-list li {
+  font-size: 12px;
+  color: var(--text-primary);
+  padding: 2px 0 2px 14px;
+  position: relative;
+}
+
+.plan-list li::before {
+  content: '·';
+  position: absolute;
+  left: 2px;
+  color: var(--text-muted);
+}
+
+.plan-empty {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ─── Letter Avatar (icon fallback) ──────────────────────────────── */
+
+.letter-avatar {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 15px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+/* ─── Setup Step Cards ───────────────────────────────────────────── */
+
+.btn-quiet {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+.btn-quiet:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.btn-quiet-link {
+  background: none;
+  border: none;
+  padding: 0 4px;
+  color: var(--text-link);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-quiet-link:hover {
+  text-decoration: underline;
+}
+
+.waiting-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.spinner-sm {
+  width: 10px;
+  height: 10px;
+  border-width: 2px;
+}
+
+/* Setup input form */
+
+.setup-input-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-light);
+}
+
+.setup-input-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 140px;
+}
+
+.setup-input-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.setup-input {
+  padding: 6px 10px;
+  background: var(--bg-code);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  outline: none;
+}
+
+.setup-input:focus {
+  border-color: var(--blue);
+}
+
+.setup-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ─── Device Code Banner ─────────────────────────────────────────── */
+
+.device-code-banner {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: var(--blue-dim);
+  border: 1px solid var(--blue);
+  border-radius: var(--radius-sm);
+}
+
+.device-code-value {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--text-primary);
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.device-code-hint {
+  font-size: 11px;
+  color: var(--text-secondary);
+  flex: 1;
+  min-width: 160px;
+}
+
+/* ─── Orchestration Card Decorations ─────────────────────────────── */
+
+.tool-card.orch-running {
+  border-color: var(--blue);
+}
+
+.tool-card.orch-done {
+  border-color: var(--green);
+}
+
+.tool-card.orch-failed {
+  border-color: var(--red);
+}
+
+.tool-card.orch-skipped {
+  border-color: var(--yellow);
+}
+
+.orch-note {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--yellow);
+}
+
+.tool-card.orch-failed .orch-note {
+  color: var(--red);
+}

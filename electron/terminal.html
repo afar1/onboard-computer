@@ -19,10 +19,12 @@
       line-height: 1.5;
       height: 100vh;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
     .terminal {
-      height: 100%;
+      flex: 1;
       padding: 12px;
       overflow-y: auto;
       white-space: pre-wrap;
@@ -36,10 +38,44 @@
     .stderr {
       color: #f85149;
     }
+
+    .terminal-input-line {
+      display: flex;
+      align-items: center;
+      border-top: 1px solid #21262d;
+      background: #161b22;
+      padding: 6px 10px;
+      flex-shrink: 0;
+    }
+
+    .terminal-input-line .prompt {
+      color: #3fb950;
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+
+    .terminal-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #e6edf3;
+      font-family: 'SF Mono', 'Fira Code', Menlo, monospace;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .terminal-input::placeholder {
+      color: #6e7681;
+    }
   </style>
 </head>
 <body>
   <div class="terminal" id="terminal"></div>
+  <div class="terminal-input-line">
+    <span class="prompt">›</span>
+    <input type="text" class="terminal-input" id="terminal-input" placeholder="Type input and press Enter…" autocomplete="off" spellcheck="false">
+  </div>
   <script>
     const terminal = document.getElementById('terminal');
 
@@ -49,6 +85,14 @@
       span.textContent = data;
       terminal.appendChild(span);
       terminal.scrollTop = terminal.scrollHeight;
+    });
+
+    const input = document.getElementById('terminal-input');
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        window.terminalAPI.sendInput(input.value + '\n');
+        input.value = '';
+      }
     });
   </script>
 </body>

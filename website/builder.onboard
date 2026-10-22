@@ -1,130 +1,20 @@
-schema_version: 1
+schema_version: 2
 name: "Builder Basics"
 description: "Everything you need to start building"
 
-dependencies:
-  - id: xcode-cli
-    name: Xcode CLI Tools
-    icon_img: https://developer.apple.com/assets/elements/icons/xcode/xcode-96x96.png
-    icon_bg: "#1c7ed6"
-    desc: Apple's command line developer tools. Compilers, git, and build essentials.
-    check: xcode-select -p
-    install: xcode-select --install
+brew: [git, gh, node, python, codex]
 
-  - id: homebrew
-    name: Homebrew
-    icon_img: homebrew.svg
-    icon_bg: "#fbb040"
-    desc: The package manager for macOS. Installs everything else.
-    check: which brew
-    install: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
-    depends_on: xcode-cli
+cask: [claude-code, cursor, alfred, caffeine, rectangle]
 
-  - id: bun
-    name: Bun
-    icon_img: bun.svg
-    icon_bg: "#fbf0df"
-    desc: Fast JavaScript runtime and package manager.
-    check: which bun
-    install: brew install oven-sh/bun/bun
-    depends_on: homebrew
-
-  - id: claude
-    name: Claude Code
-    icon_img: https://www.anthropic.com/images/icons/apple-touch-icon.png
-    icon_bg: "#cc785c"
-    desc: AI coding assistant from Anthropic.
-    check: which claude
-    install: brew install claude
-    depends_on: homebrew
-
-  - id: gh
-    name: GitHub CLI
-    icon_img: github.png
-    icon_bg: "#24292e"
-    desc: Interact with GitHub from your terminal.
-    check: which gh
-    install: brew install gh
-    depends_on: homebrew
-
-  - id: git
-    name: Git
-    icon_img: git.png
-    icon_bg: "#f0f0f0"
-    desc: Version control. Track changes, collaborate, push to GitHub.
-    check: which git
-    install: brew install git
-    depends_on: homebrew
-
-  - id: node
-    name: Node.js
-    icon_img: nodejs.svg
-    icon_bg: "#333"
-    desc: JavaScript runtime. Runs JS outside the browser, powers npm.
-    check: which node
-    install: brew install node
-    depends_on: homebrew
-
-  - id: python
-    name: Python 3
-    icon_img: python.svg
-    icon_bg: "#306998"
-    desc: Versatile scripting language. Used by many tools and AI libraries.
-    check: which python3
-    install: brew install python
-    depends_on: homebrew
-
-apps:
-  - id: alfred
-    name: Alfred
-    icon_img: Alfred-5.png
-    icon_bg: "#5c2d91"
-    desc: Productivity launcher and workflows.
-    check: ls /Applications/Alfred\ 5.app || ls /Applications/Alfred\ 4.app || ls /Applications/Alfred.app
-    install: brew install --cask alfred
-    depends_on: homebrew
-
-  - id: caffeine
-    name: Caffeine
-    icon_img: Caffeine.png
-    icon_bg: "#4a3728"
-    desc: Keep your Mac awake during presentations or long tasks.
-    check: ls /Applications/Caffeine.app
-    install: brew install --cask caffeine
-    depends_on: homebrew
-
-  - id: cursor
-    name: Cursor
-    icon_img: Cursor.png
-    icon_bg: "#1a1a2e"
-    desc: AI-powered code editor.
-    check: ls /Applications/Cursor.app
-    install: brew install --cask cursor
-    depends_on: homebrew
-
+setup:
+  - github
+  - git-identity
+  - claude
+  - codex-auth
   - id: fieldtheory
     name: Field Theory
+    desc: "Local voice transcripts and context management. Download the app and drag it to Applications."
+    url: https://fieldtheory.com
     icon_img: fieldtheory-icon.png
     icon_bg: "#1a1a2e"
-    desc: Local voice transcripts and context management.
-    check: ls /Applications/Field\ Theory.app
-    install: brew install --cask fieldtheory
-    depends_on: homebrew
-
-  - id: rectangle
-    name: Rectangle
-    icon_img: Rectangle.png
-    icon_bg: "#2ecc71"
-    desc: Window management with keyboard shortcuts.
-    check: ls /Applications/Rectangle.app
-    install: brew install --cask rectangle
-    depends_on: homebrew
-
-  - id: xcode
-    name: Xcode
-    icon_img: https://developer.apple.com/assets/elements/icons/xcode/xcode-96x96.png
-    icon_bg: "#147EFB"
-    desc: Apple's full IDE. Required for iOS/macOS development.
-    check: ls /Applications/Xcode.app
-    install: open "macappstore://apps.apple.com/app/xcode/id497799835"
-    depends_on: xcode-cli
+    check: ls "/Applications/Field Theory.app"

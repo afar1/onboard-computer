@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' https: data:">
   <title>onboard.computer</title>
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -50,6 +50,16 @@
       </div>
     </div>
 
+    <!-- Hero: one-button setup -->
+    <div class="setup-hero">
+      <div class="setup-hero-text">
+        <button class="btn btn-primary btn-hero" id="setup-mac-btn" onclick="startSetupFlow()">Set up my Mac</button>
+        <span class="ready-line" id="ready-line"></span>
+      </div>
+      <div class="phase-banner" id="phase-banner" style="display: none;"></div>
+      <div class="summary-panel" id="summary-panel" style="display: none;"></div>
+    </div>
+
     <!-- Config history popup -->
     <div class="config-history-popup" id="config-history-popup" style="display: none;">
       <div class="config-history-header">
@@ -63,13 +73,12 @@
       <ul class="config-history-list" id="config-history-list"></ul>
     </div>
 
-    <!-- System Dependencies Section -->
-    <div class="section">
+    <!-- Dependencies Section -->
+    <div class="section" id="deps-section">
       <div class="section-header">
-        <h3>System Dependencies</h3>
+        <h3>Dependencies</h3>
         <div class="section-actions">
           <span class="progress-label" id="deps-progress-label"></span>
-          <button class="btn btn-primary btn-sm" id="install-all-deps-btn" onclick="installAllDeps()">Install Dependencies</button>
         </div>
       </div>
       <div id="tools-container" class="cards-container"></div>
@@ -81,10 +90,20 @@
         <h3>Apps</h3>
         <div class="section-actions">
           <span class="progress-label" id="apps-progress-label"></span>
-          <button class="btn btn-primary btn-sm" id="install-all-apps-btn" onclick="installAllApps()">Install Apps</button>
         </div>
       </div>
       <div id="apps-container" class="cards-container"></div>
+    </div>
+
+    <!-- Setup Steps Section (hidden when none) -->
+    <div class="section" id="setup-section" style="display: none;">
+      <div class="section-header">
+        <h3>Setup steps</h3>
+        <div class="section-actions">
+          <span class="progress-label" id="setup-progress-label"></span>
+        </div>
+      </div>
+      <div id="setup-container" class="cards-container"></div>
     </div>
 
   </div><!-- end main-content -->
@@ -159,6 +178,20 @@
       <div class="modal-actions">
         <button class="btn" onclick="hideUninstallModal()">Cancel</button>
         <button class="btn btn-danger" id="uninstall-confirm-btn" onclick="confirmUninstall()" disabled>Uninstall</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Set up my Mac plan modal -->
+  <div class="modal-overlay" id="plan-modal" style="display: none;">
+    <div class="modal modal-wide">
+      <div class="modal-header">
+        <h3>Set up my Mac</h3>
+      </div>
+      <div class="modal-body" id="plan-modal-body"></div>
+      <div class="modal-actions">
+        <button class="btn" onclick="hidePlanModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="confirmStartSetup()">Start setup</button>
       </div>
     </div>
   </div>

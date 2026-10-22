@@ -1,52 +1,13 @@
-schema_version: 1
+schema_version: 2
 name: "Web Developer"
 description: "Minimal setup for frontend and full-stack web development"
 
-dependencies:
-  - id: xcode-cli
-    name: Xcode CLI Tools
-    icon_img: https://developer.apple.com/assets/elements/icons/xcode/xcode-96x96.png
-    icon_bg: "#1c7ed6"
-    desc: Apple's command line developer tools.
-    check: xcode-select -p
-    install: xcode-select --install
+brew: [git, gh, node]
 
-  - id: homebrew
-    name: Homebrew
-    icon_img: homebrew.svg
-    icon_bg: "#fbb040"
-    desc: The package manager for macOS.
-    check: which brew
-    install: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
-    depends_on: xcode-cli
+cask: [rectangle, visual-studio-code]
 
-  - id: gh
-    name: GitHub CLI
-    icon_img: github.png
-    icon_bg: "#24292e"
-    desc: Manage repos and PRs from terminal.
-    check: which gh
-    install: brew install gh
-    depends_on: homebrew
-
-  - id: git
-    name: Git
-    icon_img: git.png
-    icon_bg: "#f0f0f0"
-    desc: Version control for tracking code changes.
-    check: which git
-    install: brew install git
-    depends_on: homebrew
-
-  - id: node
-    name: Node.js
-    icon_img: nodejs.svg
-    icon_bg: "#333"
-    desc: JavaScript runtime and npm package manager.
-    check: which node
-    install: brew install node
-    depends_on: homebrew
-
+# Figma isn't in a known-name map, so it's spelled out in long form here to
+# show both styles still work side by side.
 apps:
   - id: figma
     name: Figma
@@ -55,22 +16,4 @@ apps:
     desc: Design and prototyping tool.
     check: ls /Applications/Figma.app
     install: brew install --cask figma
-    depends_on: homebrew
-
-  - id: rectangle
-    name: Rectangle
-    icon_img: Rectangle.png
-    icon_bg: "#2ecc71"
-    desc: Window management with keyboard shortcuts.
-    check: ls /Applications/Rectangle.app
-    install: brew install --cask rectangle
-    depends_on: homebrew
-
-  - id: vscode
-    name: VS Code
-    icon_img: https://code.visualstudio.com/assets/images/code-stable.png
-    icon_bg: "#007ACC"
-    desc: Popular code editor from Microsoft.
-    check: ls /Applications/Visual\ Studio\ Code.app
-    install: brew install --cask visual-studio-code
     depends_on: homebrew

@@ -1,0 +1,83 @@
+#!/bin/sh
+# onboard.computer bootstrap installer
+#   curl -fsSL https://onboard.computer/install | sh
+set -eu
+
+APP_PATH="/Applications/onboard.computer.app"
+API_URL="https://api.github.com/repos/afar1/onboard-releases/releases/latest"
+
+if [ "$(uname)" != "Darwin" ]; then
+  echo "onboard.computer only supports macOS. Exiting." >&2
+  exit 1
+fi
+
+open_app() {
+  if [ -n "${ONBOARD_CONFIG:-}" ]; then
+    echo "Waiting for onboard.computer to launch…"
+    sleep 2
+    open "onboard://load?url=${ONBOARD_CONFIG}"
+  else
+    open "$APP_PATH"
+  fi
+}
+
+if [ -d "$APP_PATH" ]; then
+  echo "onboard.computer is already installed. Opening it…"
+  open_app
+  exit 0
+fi
+
+echo "Looking up the latest onboard.computer release…"
+RELEASE_JSON=$(curl -fsSL "$API_URL") || {
+  echo "Could not reach GitHub to find the latest release. Check your internet connection and try again." >&2
+  exit 1
+}
+
+DMG_URL=$(printf '%s\n' "$RELEASE_JSON" | grep -o '"browser_download_url": *"[^"]*\.dmg"' | sed -E 's/^"browser_download_url": *"//; s/"$//' | grep 'arm64' | head -n 1)
+if [ -z "$DMG_URL" ]; then
+  DMG_URL=$(printf '%s\n' "$RELEASE_JSON" | grep -o '"browser_download_url": *"[^"]*\.dmg"' | sed -E 's/^"browser_download_url": *"//; s/"$//' | head -n 1)
+fi
+
+if [ -z "$DMG_URL" ]; then
+  echo "Could not find a .dmg in the latest onboard.computer release." >&2
+  exit 1
+fi
+
+VERSION=$(printf '%s\n' "$DMG_URL" | sed -E 's#.*/download/v?([^/]+)/[^/]+$#\1#')
+echo "Downloading onboard.computer $VERSION…"
+
+WORK_DIR=$(mktemp -d)
+MOUNT_DIR="$WORK_DIR/mount"
+cleanup() {
+  hdiutil detach -quiet "$MOUNT_DIR" 2>/dev/null || true
+  rm -rf "$WORK_DIR"
+}
+trap cleanup EXIT
+
+DMG_PATH="$WORK_DIR/onboard.computer.dmg"
+curl -fsSL "$DMG_URL" -o "$DMG_PATH" || {
+  echo "Download failed. Please try again." >&2
+  exit 1
+}
+
+echo "Installing onboard.computer to /Applications…"
+mkdir -p "$MOUNT_DIR"
+hdiutil attach -nobrowse -quiet -mountpoint "$MOUNT_DIR" "$DMG_PATH"
+
+SRC_APP=$(find "$MOUNT_DIR" -maxdepth 1 -name '*.app' | head -n 1)
+if [ -z "$SRC_APP" ]; then
+  echo "Could not find onboard.computer.app inside the disk image." >&2
+  hdiutil detach -quiet "$MOUNT_DIR" || true
+  exit 1
+fi
+
+if ! cp -R "$SRC_APP" /Applications/ 2>/dev/null; then
+  ditto "$SRC_APP" "$APP_PATH"
+fi
+
+hdiutil detach -quiet "$MOUNT_DIR"
+
+echo "onboard.computer $VERSION installed. Opening it…"
+open_app
+
+echo "All set — welcome to onboard.computer."

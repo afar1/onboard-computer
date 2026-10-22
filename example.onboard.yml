@@ -1,13 +1,31 @@
-name: "Onboard Demo"
-description: "A sample onboard file to demonstrate cell execution."
+# Example .onboard config — see README.md "Config format" for full docs.
 
-cells:
-  - type: bash
-    title: "Check Swift version"
-    description: "Verify that Swift is installed and print its version."
-    command: "swift --version"
+name: "My Team Setup"
+description: "Everything needed for frontend development"
 
-  - type: bash
-    title: "List current directory"
-    description: "Show the contents of the current working directory."
-    command: "ls -la"
+# Shorthand: list Homebrew formula names and onboard.computer derives the
+# id, name, icon, and check/install/uninstall/upgrade commands for you.
+brew: [git, gh, node]
+
+# Same idea for casks (GUI apps installed via `brew install --cask`).
+cask: [rectangle, visual-studio-code]
+
+# Setup steps reference built-in recipes by name, or you can inline a
+# custom one (see `fieldtheory` in electron/examples/builder.onboard).
+setup:
+  - github
+  - git-identity
+
+# xcode-cli and homebrew are auto-prepended whenever brew/cask are used,
+# so you don't need to list them yourself.
+
+# ─── Long form still works ──────────────────────────────────────────
+# Useful when a tool needs a custom check/install that the shorthand
+# can't derive (e.g. it's not a Homebrew package).
+dependencies:
+  - id: rustup
+    name: Rust
+    desc: Systems programming language toolchain installer.
+    check: which rustup
+    install: 'curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y'
+    depends_on: homebrew

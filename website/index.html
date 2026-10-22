@@ -279,6 +279,20 @@
   </section>
 
   <section class="configs">
+    <div class="configs-section">
+      <h2>Install on a new Mac</h2>
+      <div class="create-box">
+        <p>One line, no download page needed:</p>
+        <div class="install-cmd" id="install-oneliner">curl -fsSL https://onboard.computer/install | sh</div>
+        <button class="copy-btn" onclick="copyOneliner()"><span id="copy-oneliner-label">Copy</span></button>
+        <p style="margin-top: 12px">Preload a team config by setting <code>ONBOARD_CONFIG</code> first:</p>
+        <div class="install-cmd">ONBOARD_CONFIG=https://example.com/team.onboard curl -fsSL https://onboard.computer/install | sh</div>
+        <p style="margin-top: 12px">Already installed? Share configs in Slack with an <code>onboard://load?url=&lt;config-url&gt;</code> link — clicking it opens onboard.computer and loads that config directly.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="configs">
     <div class="configs-grid">
       <div class="configs-section">
         <h2>Example configs</h2>
@@ -347,6 +361,20 @@
       const cmd = document.getElementById('install-cmd').textContent;
       navigator.clipboard.writeText(cmd).then(() => {
         const label = document.getElementById('copy-label');
+        const btn = label.closest('.copy-btn');
+        label.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          label.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+
+    function copyOneliner() {
+      const cmd = document.getElementById('install-oneliner').textContent;
+      navigator.clipboard.writeText(cmd).then(() => {
+        const label = document.getElementById('copy-oneliner-label');
         const btn = label.closest('.copy-btn');
         label.textContent = 'Copied!';
         btn.classList.add('copied');
