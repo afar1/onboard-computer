@@ -3,7 +3,7 @@
 // The renderer addresses items by id over IPC; raw command strings never
 // cross the bridge in either direction.
 
-const { app, BrowserWindow, ipcMain, shell, dialog, clipboard } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, dialog, clipboard, net } = require('electron');
 const path = require('path');
 const { exec, spawn, execFile } = require('child_process');
 const fs = require('fs');
@@ -14,6 +14,13 @@ const brew = require('./brew');
 const orchestrator = require('./orchestrator');
 const assistedSetup = require('./assisted-setup');
 assistedSetup.register({ ipcMain, shell, clipboard, isInstallerBusy: () => orchestrateRunning || activeProcesses.size > 0 });
+
+// Make credentials: 'omit' exclude TLS client certificates, including cached identities.
+const clientCertOmissionDisabled = app.commandLine.getSwitchValue('disable-features')
+  .split(',').some((feature) => feature.split(/[<:]/)[0].trim() === 'OmitCorsClientCert');
+app.commandLine.appendSwitch('enable-features', [
+  app.commandLine.getSwitchValue('enable-features'), 'OmitCorsClientCert',
+].filter(Boolean).join(','));
 
 // Configure auto-updater
 autoUpdater.autoDownload = false;
@@ -397,8 +404,16 @@ ipcMain.handle('config:loadFile', async (_event, filePath) => {
 
 ipcMain.handle('config:loadURL', async (_event, url) => {
   try {
-    if (!/^https?:\/\//i.test(url)) throw new Error('Config URLs must be http(s)');
-    const response = await fetch(url);
+    if (clientCertOmissionDisabled) throw new Error('Remote config loading is unavailable with TLS client certificate omission disabled');
+    const parsedURL = new URL(url);
+    if (parsedURL.protocol !== 'http:' && parsedURL.protocol !== 'https:') {
+      throw new Error('Config URLs must be http(s)');
+    }
+    const response = await net.fetch(url, {
+      credentials: 'omit',
+      cache: 'no-store',
+      bypassCustomProtocolHandlers: true,
+    });
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
