@@ -165,7 +165,7 @@ function register({
     const snapshot = await status();
     // Never include the helper discovery file or authentication credentials.
     const prompt = setupPrompt(host, snapshot);
-    clipboard.writeText(prompt);
+    await clipboard.writeText(prompt);
     return { prompt };
   });
   ipcMain.handle("assisted:open", async (_event, target) => {
