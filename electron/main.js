@@ -2,13 +2,20 @@
 // Creates the onboarding window and handles all shell execution
 // via IPC so the renderer never touches Node directly.
 
-const { app, BrowserWindow, ipcMain, shell, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, dialog, net } = require('electron');
 const path = require('path');
 const { exec, spawn } = require('child_process');
 const fs = require('fs');
 const os = require('os');
 const yaml = require('js-yaml');
 const { autoUpdater } = require('electron-updater');
+
+// Make credentials: 'omit' exclude TLS client certificates, including cached identities.
+const clientCertOmissionDisabled = app.commandLine.getSwitchValue('disable-features')
+  .split(',').some((feature) => feature.split(/[<:]/)[0].trim() === 'OmitCorsClientCert');
+app.commandLine.appendSwitch('enable-features', [
+  app.commandLine.getSwitchValue('enable-features'), 'OmitCorsClientCert',
+].filter(Boolean).join(','));
 
 // Configure auto-updater
 autoUpdater.autoDownload = false;
@@ -300,7 +307,16 @@ ipcMain.handle('config:loadFile', async (_event, filePath) => {
 // Load config from a URL
 ipcMain.handle('config:loadURL', async (_event, url) => {
   try {
-    const response = await fetch(url);
+    if (clientCertOmissionDisabled) throw new Error('Remote config loading is unavailable with TLS client certificate omission disabled');
+    const parsedURL = new URL(url);
+    if (parsedURL.protocol !== 'http:' && parsedURL.protocol !== 'https:') {
+      throw new Error('Config URLs must be http(s)');
+    }
+    const response = await net.fetch(url, {
+      credentials: 'omit',
+      cache: 'no-store',
+      bypassCustomProtocolHandlers: true,
+    });
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
